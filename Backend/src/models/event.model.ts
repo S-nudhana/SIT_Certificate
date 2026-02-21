@@ -57,7 +57,7 @@ export async function deleteEventModel(event: EventDeletePayload): Promise<Event
 export async function getAllEventsModel(): Promise<EventGetAllResponse[] | null> {
     try {
         const [rows] = await db.query<EventDetailQuery[]>(
-            "SELECT event_id, event_title, event_status, created_at FROM events WHERE event_status = 'active' ORDER BY created_at DESC"
+            "SELECT event_id, event_title, event_status, created_at FROM events WHERE event_status = 'active' ORDER BY event_created_at DESC"
         )
         if (!rows || rows.length === 0) {
             return null
