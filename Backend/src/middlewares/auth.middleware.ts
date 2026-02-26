@@ -27,6 +27,7 @@ export default function authMiddleware(requiredRoles: string[] = []) {
             if (!userRole || !requiredRoles.includes(userRole.userRole)) {
                 return c.json({ authorized: false, message: "Unauthorized" }, 401)
             }
+            c.set('userData', tokenData);
             await next()
         } catch (error) {
             console.error(error)
