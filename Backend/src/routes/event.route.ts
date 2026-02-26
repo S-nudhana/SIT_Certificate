@@ -14,8 +14,7 @@ event.post('/', authMiddleware(['admin']), createEvent)
 event.put('/:id', authMiddleware(['admin']), updateEvent)
 event.delete('/:id', authMiddleware(['admin']), deleteEvent)
 
-event.get('', getEvents)
-// event.get('/', authMiddleware(['admin', 'professor']), getEvents)
+event.get('/', authMiddleware(['admin', 'professor']), getEvents)
 event.get('/:id', authMiddleware(['admin', 'professor']), getEvent)
 
 export default event;
