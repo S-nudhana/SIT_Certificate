@@ -7,6 +7,7 @@ export interface UserQuery extends RowDataPacket{
 }
 
 export interface UserAuthQuery extends RowDataPacket {
+    user_id: string,
     user_role: string
 }
 

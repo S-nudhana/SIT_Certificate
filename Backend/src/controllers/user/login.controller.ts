@@ -1,33 +1,46 @@
 import { Context } from "hono"
-import { setSignedCookie } from "hono/cookie"
+import { setSignedCookie, deleteCookie } from "hono/cookie"
 
 import { signToken } from "../../utils/jwt"
+import { findUserByEmail } from "../../models/user.model"
+
+const CLIENT_URL = Bun.env.CLIENT_URL!
+const COOKIE_SECRET = Bun.env.COOKIE_SECRET!
 
 export default async function login(c: Context) {
   try {
-    const body = await c.req.json()
 
-    //signin method
+    const user = c.get("user-google")
 
-    const user_id = "123456789"
-    const user_role = "admin"
-
-    const COOKIE_SECRET = process.env.COOKIE_SECRET
-    if (!COOKIE_SECRET) {
-      throw new Error("Cookie Secret is not set")
+    if (!user?.email || !user?.id) {
+      deleteCookie(c, "state")
+      return c.redirect(`${CLIENT_URL}/login`)
     }
 
-    const token = await signToken(user_id, user_role)
-    await setSignedCookie(c, 'session', token, COOKIE_SECRET, {
+    const userData = await findUserByEmail(user.email)
+
+    if (!userData) {
+      deleteCookie(c, "state")
+      return c.redirect(`${CLIENT_URL}/login`)
+    }
+
+    const token = await signToken({
+      user_id: userData.user_id,
+      user_role: userData.user_role
+    })
+
+    await setSignedCookie(c, "session", token, COOKIE_SECRET, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: 'Strict',
-      path: '/',
+      secure: Bun.env.NODE_ENV === "production",
+      sameSite: "Lax",
+      path: "/",
       maxAge: 60 * 60 * 24
     })
-    return c.json({ message: "Login Successfully" }, 200)
+
+    return c.redirect(CLIENT_URL)
+
   } catch (error) {
     console.error(error)
-    return c.json({ message: "Internal Server Error" }, 500)
+    return c.redirect(`${CLIENT_URL}/login`)
   }
 }

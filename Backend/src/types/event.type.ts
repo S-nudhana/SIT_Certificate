@@ -38,6 +38,7 @@ export interface EventCreatePayload {
     title: string
     status: string
     startDate: Date
+    createdBy: string
 }
 
 export interface EventCreateResponse {

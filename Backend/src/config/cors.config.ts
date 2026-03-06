@@ -3,7 +3,8 @@ import { cors } from 'hono/cors'
 export const corsConfig = cors({
     origin: (origin) => {
         const allowedOrigins = [
-            'http://localhost:5173'
+            Bun.env.CLIENT_URL,
+            Bun.env.GOOGLE_REDIRECT_URL
         ]
         if (origin && allowedOrigins.includes(origin)) {
             return origin
