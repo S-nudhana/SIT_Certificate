@@ -1,14 +1,13 @@
-import { Context, Next } from "hono";
-import { getSignedCookie } from "hono/cookie";
+import { Context, Next, MiddlewareHandler } from "hono"
+import { getSignedCookie } from "hono/cookie"
 
-import { TokenData } from "../types/jwt.type";
-import { UserRoleResponse } from "../types/user.type";
+import { TokenData } from "../types/jwt.type"
+import { UserRoleResponse } from "../types/user.type"
 
-import { findUserRoleById } from "../models/user.model";
+import { findUserRoleById } from "../models/user.model"
+import { verifyToken } from "../utils/jwt"
 
-import { verifyToken } from "../utils/jwt";
-
-export default function authMiddleware(requiredRoles: string[] = []) {
+export default function authMiddleware(requiredRoles: string[] = []): MiddlewareHandler {
     return async (c: Context, next: Next) => {
         try {
             const COOKIE_SECRET = Bun.env.COOKIE_SECRET
@@ -16,7 +15,8 @@ export default function authMiddleware(requiredRoles: string[] = []) {
                 throw new Error("Cookie Secret is not set")
             }
 
-            const session = await getSignedCookie(c, COOKIE_SECRET, 'session')
+            const session = await getSignedCookie(c, COOKIE_SECRET, "session")
+
             if (!session) {
                 return c.json(
                     { authorized: false, code: "NO_SESSION", message: "Unauthorized" },
@@ -25,6 +25,7 @@ export default function authMiddleware(requiredRoles: string[] = []) {
             }
 
             const tokenData: TokenData | null = await verifyToken({ token: session })
+
             if (!tokenData) {
                 return c.json(
                     { authorized: false, code: "INVALID_SESSION", message: "Invalid session" },
@@ -40,16 +41,21 @@ export default function authMiddleware(requiredRoles: string[] = []) {
             }
 
             const userRole: UserRoleResponse | null = await findUserRoleById(tokenData.uid)
+
             if (!userRole || !requiredRoles.includes(userRole.userRole)) {
                 return c.json(
                     { authorized: false, code: "UNAUTHORIZED", message: "Unauthorized" },
                     401
                 )
             }
-            c.set('userData', tokenData);
+
+            c.set("userData", tokenData)
+
             await next()
+
         } catch (error) {
             console.error(error)
+
             return c.json(
                 { authorized: false, code: "INTERNAL_SERVER_ERROR", message: "Internal Server Error" },
                 500

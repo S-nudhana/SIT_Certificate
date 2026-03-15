@@ -12,6 +12,6 @@ export default async function getEvents(c: Context) {
         return c.json({ data: { events: events }, message: "Events Found" }, 200)
     } catch (error) {
         console.error(error)
-        return c.json({ data: { events: [] }, message: "Internal Server Error" }, 500)
+        return c.json({ data: { events: null }, message: "Internal Server Error" }, 500)
     }
 }

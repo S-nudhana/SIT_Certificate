@@ -15,6 +15,17 @@ export interface EventFullDetailQuery extends RowDataPacket {
     event_date: Date
 }
 
+export interface EventGetCertificateTemplateQuery extends RowDataPacket {
+    event_certificate_template: string
+}
+
+export interface EventGetCertificateTemplateResponse {
+    certificateTemplate: string
+    certificateExcel: string
+    textSize: number
+    textYPosition: number
+}
+
 export interface EventGetAllResponse {
     eventID: number
     eventTitle: string
@@ -38,6 +49,12 @@ export interface EventCreatePayload {
     title: string
     status: string
     startDate: Date
+    endDate: Date
+    certTemplate: string
+    certExcel: string
+    emailTemplate: string
+    textSize: number
+    textYPos: number
     createdBy: string
 }
 
@@ -48,14 +65,25 @@ export interface EventCreateResponse {
 
 export interface EventUpdatePayload {
     eventID: number
-    title?: string
-    status?: string
-    startDate?: Date
+    title: string
+    status: string
+    startDate: Date
+    endDate: Date
+    certTemplate: string
+    certExcel: string
+    emailTemplate: string
+    textSize: number
+    textYPos: number
+    createdBy: string
 }
 
 export interface EventUpdateResponse {
     status: boolean
     eventID: number
+}
+
+export interface EventUpdateStatusResponse {
+    status: boolean
 }
 
 export interface EventDeletePayload {
@@ -64,4 +92,12 @@ export interface EventDeletePayload {
 
 export interface EventDeleteResponse {
     status: boolean
+}
+
+export interface EventGetCertificateDownloadQuery extends RowDataPacket {
+    certificate_filePath: string
+}
+
+export interface EventGetCertificateDownloadResponse {
+    certificate_filePath: string
 }
