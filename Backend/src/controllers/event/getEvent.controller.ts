@@ -1,8 +1,8 @@
 import { Context } from "hono";
 
 import { getEventByIdModel } from "../../models/event.model";
-import { getEventByIdSchema } from "../../validators/event.schema";
-import { EventGetByIDResponse, EventGetByIDPayload } from "../../types/event.type";
+import { getEventByIdSchema } from "../../validators/event.validators";
+import { EventGetByIDResponse } from "../../types/event.type";
 
 export default async function getEvent(c: Context) {
     try {
@@ -10,16 +10,11 @@ export default async function getEvent(c: Context) {
         const result = getEventByIdSchema.safeParse(id)
         if (!result.success) {
             return c.json({
-                data: null,
+                data: { event: null },
                 message: 'Input Format is Invalid',
             }, 400)
         }
-
-        const getEventByIDPayload: EventGetByIDPayload = {
-            eventID: result.data.eventID
-        }
-
-        const event: EventGetByIDResponse | null = await getEventByIdModel(getEventByIDPayload)
+        const event: EventGetByIDResponse | null = await getEventByIdModel(result.data.eventID)
         if (!event) {
             return c.json({ data: { event: null }, message: "Event Not Found" }, 404)
         }
