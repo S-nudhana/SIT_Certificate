@@ -14,14 +14,12 @@ import {
     EventUpdateStatusResponse,
     EventGetCertificateTemplateQuery,
     EventGetCertificateTemplateResponse,
-    EventGetCertificateDownloadResponse,
-    EventGetCertificateDownloadQuery
 } from "../types/event.type"
 
 export async function createEventModel(event: EventCreatePayload): Promise<EventCreateResponse> {
     try {
         const [result] = await db.query<ResultSetHeader>(
-            "INSERT INTO events (event_title, event_status, event_date, event_end_date, event_certificate_template, event_certificate_excel, event_email_template, event_text_size, event_text_y_position, event_created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO events (event_title, event_status, event_startDate, event_endDate, event_certificate_template, event_certificate_excel, event_email_template, event_text_size, event_text_y_position, event_createBy) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             [event.title, event.status, event.startDate, event.endDate, event.certTemplate, event.certExcel, event.emailTemplate, event.textSize, event.textYPos, event.createdBy]
         )
         return { status: result.affectedRows > 0, eventID: result.insertId }
@@ -34,7 +32,7 @@ export async function createEventModel(event: EventCreatePayload): Promise<Event
 export async function updateEventModel(event: EventUpdatePayload): Promise<EventUpdateResponse> {
     try {
         const [result] = await db.query<ResultSetHeader>(
-            "UPDATE events SET event_title = ?, event_status = ?, event_date = ?, event_end_date = ?, event_certificate_template = ?, event_certificate_excel = ?, event_email_template = ?, event_text_size = ?, event_text_y_position = ? WHERE event_id = ?",
+            "UPDATE events SET event_title = ?, event_status = ?, event_startDate = ?, event_endDate = ?, event_certificate_template = ?, event_certificate_excel = ?, event_email_template = ?, event_text_size = ?, event_text_y_position = ? WHERE event_id = ?",
             [event.title, event.status, event.startDate, event.endDate, event.certTemplate, event.certExcel, event.emailTemplate, event.textSize, event.textYPos, event.eventID]
         )
         return { status: result.affectedRows > 0, eventID: event.eventID }
@@ -60,16 +58,17 @@ export async function deleteEventModel(eventId: number): Promise<EventDeleteResp
 export async function getAllEventsModel(): Promise<EventGetAllResponse[] | null> {
     try {
         const [rows] = await db.query<EventDetailQuery[]>(
-            "SELECT event_id, event_title, event_status, event_date FROM events WHERE event_status = 'active' ORDER BY event_created_at DESC"
+            "SELECT event_id, event_title, event_status, event_startDate, event_endDate FROM events WHERE event_status = 'created' or event_status = 'cert_generated' ORDER BY event_createAt DESC"
         )
         if (!rows || rows.length === 0) {
             return null
         }
         return rows.map((row: EventDetailQuery) => ({
-            eventID: row.id,
-            eventTitle: row.title,
-            eventStatus: row.status,
-            eventDate: row.event_date
+            eventID: row.event_id,
+            eventTitle: row.event_title,
+            eventStatus: row.event_status,
+            eventStartDate: row.event_startDate,
+            eventEndDate: row.event_endDate
         }))
     } catch (error) {
         console.error(error)
@@ -80,7 +79,7 @@ export async function getAllEventsModel(): Promise<EventGetAllResponse[] | null>
 export async function getEventByIdModel(eventId: number): Promise<EventGetByIDResponse | null> {
     try {
         const [rows] = await db.query<EventFullDetailQuery[]>(
-            "SELECT event_id, event_title, event_certificate_url, event_status, event_date FROM events WHERE event_id = ?",
+            "SELECT event_id, event_title, event_certificate_url, event_status, event_startDate, event_endDate FROM events WHERE event_id = ?",
             [eventId]
         )
         if (!rows || rows.length === 0) {
@@ -91,7 +90,8 @@ export async function getEventByIdModel(eventId: number): Promise<EventGetByIDRe
             eventTitle: rows[0].event_title,
             certificateURL: rows[0].certificate_url,
             eventStatus: rows[0].event_status,
-            eventDate: rows[0].event_date
+            eventStartDate: rows[0].event_startDate,
+            eventEndDate: rows[0].event_endDate
         }
     } catch (error) {
         console.error(error)
@@ -99,23 +99,10 @@ export async function getEventByIdModel(eventId: number): Promise<EventGetByIDRe
     }
 }
 
-export async function updateEventStatus(eventID: number, status: string): Promise<EventUpdateStatusResponse> {
-    try {
-        const [result] = await db.query<ResultSetHeader>(
-            "UPDATE events SET event_status = ? WHERE event_id = ?",
-            [status, eventID]
-        )
-        return { status: result.affectedRows === 1 }
-    } catch (error) {
-        console.error(error)
-        return { status: false }
-    }
-}
-
 export async function getEventCertificateTemplateExcelModel(eventID: number): Promise<EventGetCertificateTemplateResponse | null> {
     try {
         const [rows] = await db.query<EventGetCertificateTemplateQuery[]>(
-            "SELECT event_certificate_template, event_certificate_excel, event_text_size, event_text_y_position FROM events WHERE event_id = ?",
+            "SELECT event_certificate_template, event_certificate_excel, event_text_size, event_text_y_pos FROM events WHERE event_id = ?",
             [eventID]
         )
         if (!rows || rows.length === 0) {
@@ -125,7 +112,7 @@ export async function getEventCertificateTemplateExcelModel(eventID: number): Pr
             certificateTemplate: rows[0].event_certificate_template,
             certificateExcel: rows[0].event_certificate_excel,
             textSize: rows[0].event_text_size,
-            textYPosition: rows[0].event_text_y_position
+            textYPosition: rows[0].event_text_y_pos
         }
     } catch (error) {
         console.error(error)
@@ -133,33 +120,15 @@ export async function getEventCertificateTemplateExcelModel(eventID: number): Pr
     }
 }
 
-export async function insertCertificateRecord(eventID: number, email: string, filename: string): Promise<boolean> {
+export async function updateEventStatusModel(eventID: number, status: string): Promise<EventUpdateStatusResponse> {
     try {
         const [result] = await db.query<ResultSetHeader>(
-            "INSERT INTO certificates (certificate_eventId, certificate_recipientEmail, certificate_filePath) VALUES (?, ?, ?)",
-            [eventID, email, filename]
+            "UPDATE events SET event_status = ? WHERE event_id = ?",
+            [status, eventID]
         )
-        return result.affectedRows === 1
+        return { status: result.affectedRows === 1, eventID: eventID }
     } catch (error) {
         console.error(error)
-        return false
-    }
-}
-
-export async function getEventCertificateDownloadModel(eventID: number): Promise<EventGetCertificateDownloadResponse[] | null> {
-    try {
-        const [rows] = await db.query<EventGetCertificateDownloadQuery[]>(
-            "SELECT certificate_filePath FROM certificates WHERE certificate_eventId = ?",
-            [eventID]
-        )
-        if (!rows || rows.length === 0) {
-            return null
-        }
-        return rows.map((row: EventGetCertificateDownloadQuery) => ({
-            certificate_filePath: row.certificate_filePath
-        }))
-    } catch (error) {
-        console.error(error)
-        return null
+        return { status: false, eventID: -1 }
     }
 }

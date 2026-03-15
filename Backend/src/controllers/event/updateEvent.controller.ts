@@ -53,7 +53,7 @@ export default async function updateEvent(c: Context) {
 
         const certTemplatePath = await saveFile(certTemplate, "templates", result.data.title.replace(/\s+/g, '_') + "_template")
         const certExcelPath = await saveFile(certExcel, "excels", result.data.title.replace(/\s+/g, '_') + "_excel")
-
+        
         const eventPayload: EventUpdatePayload = {
             eventID: result.data.eventID,
             title: result.data.title,
