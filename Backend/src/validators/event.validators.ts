@@ -5,64 +5,50 @@ export const createEventSchema = z.object({
         .string()
         .min(1, 'Title is required')
         .max(255, 'Title too long'),
-    startDate: z
-        .string()
-        .refine((date) => !isNaN(Date.parse(date)), {
-            message: 'Invalid Date Format'
-        }),
-    endDate: z
-        .string()
-        .refine((date) => !isNaN(Date.parse(date)), {
-            message: 'Invalid Date Format'
-        }),
-    emailTemplate: z
-        .string()
-        .min(1, 'Email Template is required'),
     textSize: z
         .number()
         .refine((value) => !isNaN(value), {
             message: 'Invalid Text Size'
-        }),
+        })
+        .optional(),
+    textXPos: z
+        .number()
+        .refine((value) => !isNaN(value), {
+            message: 'Invalid Text X Position'
+        })
+        .optional(),
     textYPos: z
         .number()
         .refine((value) => !isNaN(value), {
             message: 'Invalid Text Y Position'
         })
+        .optional()
 })
 
 export const updateEventSchema = z.object({
-    eventID: z
-        .number()
-        .refine((id) => !isNaN(id), {
-            message: 'Invalid Event ID'
-        }),
+    eventID: z.number(),
     title: z
         .string()
         .min(1, 'Title is required')
         .max(255, 'Title too long'),
-    startDate: z
-        .string()
-        .refine((date) => !isNaN(Date.parse(date)), {
-            message: 'Invalid Date Format'
-        }),
-    endDate: z
-        .string()
-        .refine((date) => !isNaN(Date.parse(date)), {
-            message: 'Invalid Date Format'
-        }),
-    emailTemplate: z
-        .string()
-        .min(1, 'Email Template is required'),
     textSize: z
         .number()
         .refine((value) => !isNaN(value), {
             message: 'Invalid Text Size'
-        }),
+        })
+        .optional(),
+    textXPos: z
+        .number()
+        .refine((value) => !isNaN(value), {
+            message: 'Invalid Text X Position'
+        })
+        .optional(),
     textYPos: z
         .number()
         .refine((value) => !isNaN(value), {
             message: 'Invalid Text Y Position'
         })
+        .optional()
 })
 
 export const deleteEventSchema = z.object({

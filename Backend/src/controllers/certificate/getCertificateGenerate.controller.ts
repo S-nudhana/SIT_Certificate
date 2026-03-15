@@ -27,9 +27,19 @@ export default async function getEventCertificateGenerate(c: Context) {
         }
 
         const pdfPath = template.certificateTemplate
+        if (!pdfPath) {
+            return c.json({
+                message: "Certificate template not found for the event"
+            }, 404)
+        }
         const pdfBytes = await fs.readFile(pdfPath)
 
         const excelPath = template.certificateExcel
+        if (!excelPath) {
+            return c.json({
+                message: "Excel template not found for the event"
+            }, 404)
+        }
         const workbook = XLSX.readFile(excelPath)
         const worksheet = workbook.Sheets[workbook.SheetNames[0]]
         const rows = XLSX.utils.sheet_to_json(worksheet)
@@ -46,6 +56,7 @@ export default async function getEventCertificateGenerate(c: Context) {
                     firstname,
                     lastname,
                     template.textYPosition,
+                    template.textXPosition,
                     template.textSize
                 )
             if (!certificate) {

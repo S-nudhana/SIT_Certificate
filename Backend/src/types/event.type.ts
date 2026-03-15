@@ -4,17 +4,18 @@ export interface EventDetailQuery extends RowDataPacket {
     event_id: number
     event_title: string
     event_status: string
-    event_startDate: Date
-    event_endDate: Date
+    event_participant: number
+    event_createAt: Date
 }
 
 export interface EventFullDetailQuery extends RowDataPacket {
     event_id: number
     event_title: string
     certificate_url: string
+    excel_url: string
     event_status: string
-    event_startDate: Date
-    event_endDate: Date
+    event_participant: number
+    event_createAt: Date
 }
 
 export interface EventGetCertificateTemplateQuery extends RowDataPacket {
@@ -22,9 +23,10 @@ export interface EventGetCertificateTemplateQuery extends RowDataPacket {
 }
 
 export interface EventGetCertificateTemplateResponse {
-    certificateTemplate: string
-    certificateExcel: string
+    certificateTemplate: string | null
+    certificateExcel: string | null
     textSize: number
+    textXPosition: number
     textYPosition: number
 }
 
@@ -32,8 +34,8 @@ export interface EventGetAllResponse {
     eventID: number
     eventTitle: string
     eventStatus: string
-    eventStartDate: Date
-    eventEndDate: Date
+    eventParticipant: number
+    eventCreateAt: Date
 }
 
 export interface EventGetByIDResponse {
@@ -52,13 +54,12 @@ export interface EventGetByIDPayload {
 export interface EventCreatePayload {
     title: string
     status: string
-    startDate: Date
-    endDate: Date
     certTemplate: string
     certExcel: string
-    emailTemplate: string
     textSize: number
+    textXPos: number
     textYPos: number
+    participant: number
     createdBy: string
 }
 
@@ -71,14 +72,13 @@ export interface EventUpdatePayload {
     eventID: number
     title: string
     status: string
-    startDate: Date
-    endDate: Date
     certTemplate: string
     certExcel: string
-    emailTemplate: string
     textSize: number
+    textXPos: number
     textYPos: number
     createdBy: string
+    participant: number
 }
 
 export interface EventUpdateResponse {

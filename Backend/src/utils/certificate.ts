@@ -7,6 +7,7 @@ export const fetchAndFillCertificate = async (
     name: string,
     surname: string,
     textYPosition: number,
+    textXPosition: number,
     textSize: number
 ): Promise<Buffer | null> => {
   try {
@@ -22,7 +23,7 @@ export const fetchAndFillCertificate = async (
     const { width, height } = page.getSize();
 
     const textWidth = thaiFont.widthOfTextAtSize(text, fontSize);
-    const x = (width - textWidth) / 2;
+    const x = (width - textWidth) / 2 + (textXPosition || 0);
     const y = height * (textYPosition / 100);
 
     page.drawText(text, {

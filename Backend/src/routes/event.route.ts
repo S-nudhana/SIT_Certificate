@@ -5,8 +5,8 @@ import getEvent from '../controllers/event/getEvent.controller'
 import createEvent from '../controllers/event/createEvent.controller'
 import updateEvent from '../controllers/event/updateEvent.controller'
 import deleteEvent from '../controllers/event/deleteEvent.controller'
-import getEventCertificateGenerate from '../controllers/certificate/getEventCertificateGenerate.controller'
-import getEventCertificateDownload from '../controllers/certificate/getEventCertificateDownload.controller'
+import getEventCertificateGenerate from '../controllers/certificate/getCertificateGenerate.controller'
+import getEventCertificateDownload from '../controllers/certificate/getCertificateDownload.controller'
 
 import authMiddleware from '../middlewares/auth.middleware'
 
