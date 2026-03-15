@@ -1,7 +1,17 @@
-* {
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&display=swap');
+
+body {
   font-family: 'Noto Sans Thai', sans-serif;
 }
 
-html, body, #root {
-  font-family: 'Noto Sans Thai', sans-serif;
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  scroll-behavior: smooth;
+  font-family: "Noto Sans Thai", sans-serif;
+}
+
+#root {
+  font-family: "Noto Sans Thai", sans-serif;
 }

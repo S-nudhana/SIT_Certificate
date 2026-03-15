@@ -23,10 +23,10 @@ export default function Login() {
         <Box sx={{ textAlign: "center", mb: 4, backgroundColor: "white", borderRadius: "10px", padding: "40px", boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)" }}>
           <img src={logo} alt="Logo" style={{ width: "200px", height: "auto", marginBottom: "10px" }} />
           <Divider></Divider>
-          <Typography component="h1" gutterBottom sx={{ mt: 2, fontSize: "20px" }}>
+          <Typography component="h1" gutterBottom sx={{ mt: 2, fontSize: "20px", fontWeight: "600" }}>
             เข้าสู่ระบบ
           </Typography>
-          <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", mb: 2, gap: "10px" }}>
+          <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", mb: 1, gap: "10px" }}>
             <Typography sx={{ fontSize: "32px", fontWeight: "bold" }}>
               SIT
             </Typography>
@@ -42,7 +42,7 @@ export default function Login() {
               Certificate
             </Typography>
           </Box>
-          <Typography sx={{ color: "#838B9D", fontWeight: "normal", fontSize: "16px" }}>
+          <Typography sx={{ color: "#838B9D", fontWeight: "400", fontSize: "16px" }}>
             ระบบจัดการจัดการชุดใบประกาศนียบัตร
           </Typography>
           <Button
@@ -50,15 +50,15 @@ export default function Login() {
             onClick={handleGoogleLogin}
             startIcon={<FcGoogle />}
             sx={{
-              mt: 3,
+              mt: 2,
               p: "7px 17px",
               bgcolor: "transparent",
-              color: "#757575",
+              color: "#616161",
               borderColor: "#E4E4E4",
               borderRadius: "10px",
               textTransform: "none",
               fontSize: "16px",
-              fontWeight: "normal",
+              fontWeight: "500",
               "&:hover": {
                 borderColor: "#b1b1b1",
               }
