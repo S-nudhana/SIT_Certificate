@@ -4,7 +4,8 @@ export const eventGetAllResponseSchema = z.object({
   eventID: z.number(),
   eventTitle: z.string(),
   eventStatus: z.string(),
-  eventDate: z.date()
+  eventStartDate: z.date(),
+  eventEndDate: z.date()
 })
 
 export const eventGetByIDResponseSchema = z.object({
@@ -12,7 +13,8 @@ export const eventGetByIDResponseSchema = z.object({
   eventTitle: z.string(),
   certificateURL: z.string(),
   eventStatus: z.string(),
-  eventDate: z.date()
+  eventStartDate: z.date(),
+  eventEndDate: z.date()
 })
 
 export const eventCreateResponseSchema = z.object({

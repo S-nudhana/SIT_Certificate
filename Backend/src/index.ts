@@ -8,6 +8,7 @@ import { rateLimiterConfig } from './config/rateLimiter.config'
 
 import user from './routes/user.route'
 import event from './routes/event.route'
+import certificate from './routes/certificate.route'
 
 const app = new OpenAPIHono()
 
@@ -24,6 +25,7 @@ app.get('/api/health', (c) => {
 })
 app.route('/api/user', user)
 app.route('/api/event', event)
+app.route('/api/certificate', certificate)
 
 if (Bun.env.NODE_ENV !== 'production') {
   app.doc('/api/doc', {

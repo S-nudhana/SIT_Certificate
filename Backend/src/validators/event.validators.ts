@@ -81,7 +81,7 @@ export const getEventByIdSchema = z.object({
         })
 })
 
-export const updateEventCertificateApproveSchema = z.object({
+export const updateEventStatusSchema = z.object({
     eventID: z
         .number()
         .refine((id) => !isNaN(id), {
@@ -91,21 +91,5 @@ export const updateEventCertificateApproveSchema = z.object({
         .string()
         .refine((status) => status === 'created' || status === 'pending' || status === 'completed', {
             message: 'Invalid Status'
-        })
-})
-
-export const getCertificateDownloadSchema = z.object({
-    eventID: z
-        .number()
-        .refine((id) => !isNaN(id), {
-            message: 'Invalid Event ID'
-        })
-})
-
-export const getCertificateGenerateSchema = z.object({
-    eventID: z
-        .number()
-        .refine((id) => !isNaN(id), {
-            message: 'Invalid Event ID'
         })
 })

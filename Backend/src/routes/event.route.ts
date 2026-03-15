@@ -5,8 +5,8 @@ import getEvent from '../controllers/event/getEvent.controller'
 import createEvent from '../controllers/event/createEvent.controller'
 import updateEvent from '../controllers/event/updateEvent.controller'
 import deleteEvent from '../controllers/event/deleteEvent.controller'
-import getEventCertificateGenerate from '../controllers/event/getEventCertificateGenerate.controller'
-import getEventCertificateDownload from '../controllers/event/getEventCertificateDownload.controller'
+import getEventCertificateGenerate from '../controllers/certificate/getEventCertificateGenerate.controller'
+import getEventCertificateDownload from '../controllers/certificate/getEventCertificateDownload.controller'
 
 import authMiddleware from '../middlewares/auth.middleware'
 
@@ -58,7 +58,6 @@ const getEventsRoute = createRoute({
     }
 })
 event.openapi(getEventsRoute, getEvents)
-
 
 event.use('/:id', authMiddleware(['admin', 'professor']))
 const getEventRoute = createRoute({
@@ -308,76 +307,7 @@ const deleteEventRoute = createRoute({
 })
 event.openapi(deleteEventRoute, deleteEvent)
 
-event.use('/{id}/certificate/*', authMiddleware(['admin', 'professor']))
-const generateCertificateRoute = createRoute({
-    method: 'get',
-    path: '/{id}/certificate/generate',
-    tags: ['Certificate'],
-    request: {
-        params: z.object({
-            id: z.string()
-        })
-    },
-    responses: {
-        200: {
-            description: 'Generate certificates'
-        },
-        500: {
-            description: 'Internal Server Error'
-        }
-    }
-})
-event.openapi(generateCertificateRoute, getEventCertificateGenerate)
-
-const downloadCertificateRoute = createRoute({
-    method: 'get',
-    path: '/{id}/certificate/download',
-    tags: ['Certificate'],
-    request: {
-        params: z.object({
-            id: z.string()
-        })
-    },
-    responses: {
-        200: {
-            description: 'Download certificates',
-            content: {
-                'application/zip': {
-                    schema: z.any()
-                }
-            }
-        },
-        400: {
-            description: 'Bad Request',
-            content: {
-                'application/json': {
-                    schema: apiResponse(z.null())
-                }
-            }
-        },
-        404: {
-            description: 'No certificates found',
-            content: {
-                'application/json': {
-                    schema: apiResponse(z.null())
-                }
-            }
-        },
-        500: {
-            description: 'Internal Server Error',
-            content: {
-                'application/json': {
-                    schema: apiResponse(z.null())
-                }
-            }
-        }
-    }
-})
-event.openapi(downloadCertificateRoute, getEventCertificateDownload)
-
 export default event
-
-// /* ---------------- UPDATE CERTIFICATE STATUS ---------------- */
 
 // const updateCertificateStatusRoute = createRoute({
 //   method: 'put',

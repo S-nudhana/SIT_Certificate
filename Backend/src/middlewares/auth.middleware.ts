@@ -14,7 +14,6 @@ export default function authMiddleware(requiredRoles: string[] = []): Middleware
             if (!COOKIE_SECRET) {
                 throw new Error("Cookie Secret is not set")
             }
-
             const session = await getSignedCookie(c, COOKIE_SECRET, "session")
 
             if (!session) {
@@ -23,32 +22,26 @@ export default function authMiddleware(requiredRoles: string[] = []): Middleware
                     401
                 )
             }
-
             const tokenData: TokenData | null = await verifyToken({ token: session })
-
             if (!tokenData) {
                 return c.json(
                     { authorized: false, code: "INVALID_SESSION", message: "Invalid session" },
                     401
                 )
             }
-
             if (tokenData.exp < Math.floor(Date.now() / 1000)) {
                 return c.json(
                     { authorized: false, code: "SESSION_EXPIRED", message: "Session expired" },
                     401
                 )
             }
-
             const userRole: UserRoleResponse | null = await findUserRoleById(tokenData.uid)
-
             if (!userRole || !requiredRoles.includes(userRole.userRole)) {
                 return c.json(
                     { authorized: false, code: "UNAUTHORIZED", message: "Unauthorized" },
                     401
                 )
             }
-
             c.set("userData", tokenData)
 
             await next()

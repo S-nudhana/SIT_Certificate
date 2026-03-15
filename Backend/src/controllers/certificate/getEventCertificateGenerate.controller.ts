@@ -3,18 +3,18 @@ import fs from "fs/promises"
 import path from "path"
 import XLSX from "xlsx"
 
-import { getCertificateGenerateSchema } from "../../validators/event.validators"
-import { getEventCertificateTemplateExcelModel, insertCertificateRecord } from "../../models/event.model"
+import { getCertificateGenerateSchema } from "../../validators/certificate.validators"
+import { getEventCertificateTemplateExcelModel } from "../../models/event.model"
+import { insertCertificateRecord } from "../../models/certificate.model"
 import { fetchAndFillCertificate } from "../../utils/certificate"
 
 export default async function getEventCertificateGenerate(c: Context) {
     let tempDir = ""
     try {
         const eventID = c.req.param("id")
-        const result = getCertificateGenerateSchema.safeParse(eventID)
+        const result = getCertificateGenerateSchema.safeParse({ eventID })
         if (!result.success) {
             return c.json({
-                data: null,
                 message: "Input Format is Invalid"
             }, 400)
         }
@@ -22,7 +22,6 @@ export default async function getEventCertificateGenerate(c: Context) {
         const template = await getEventCertificateTemplateExcelModel(result.data.eventID)
         if (!template) {
             return c.json({
-                data: null,
                 message: "Certificate or Excel template not found for the event"
             }, 404)
         }

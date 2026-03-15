@@ -2,9 +2,9 @@ import { Context } from "hono"
 import path from "path"
 import archiver from "archiver"
 
-import { getCertificateDownloadSchema } from "../../validators/event.validators"
-import { getEventCertificateDownloadModel } from "../../models/event.model"
-import { EventGetCertificateDownloadResponse } from "../../types/event.type"
+import { getCertificateDownloadSchema } from "../../validators/certificate.validators"
+import { getEventCertificateDownloadModel } from "../../models/certificate.model"
+import { EventGetCertificateDownloadResponse } from "../../types/certificate.type"
 
 export default async function getEventCertificateDownload(c: Context) {
     try {
