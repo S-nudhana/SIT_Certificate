@@ -2,7 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 
 import Homepage from "../pages/home.page";
 import Login from "../pages/login.page";
-import ProtectedRoute from "../components/protectedRoute.components";
+import ProtectedRoute from "../middleware/protectedRoute.components";
 
 export const router = createBrowserRouter([
   {
