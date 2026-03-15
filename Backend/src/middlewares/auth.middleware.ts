@@ -15,7 +15,6 @@ export default function authMiddleware(requiredRoles: string[] = []): Middleware
                 throw new Error("Cookie Secret is not set")
             }
             const session = await getSignedCookie(c, COOKIE_SECRET, "session")
-
             if (!session) {
                 return c.json(
                     { authorized: false, code: "NO_SESSION", message: "Unauthorized" },
@@ -48,7 +47,6 @@ export default function authMiddleware(requiredRoles: string[] = []): Middleware
 
         } catch (error) {
             console.error(error)
-
             return c.json(
                 { authorized: false, code: "INTERNAL_SERVER_ERROR", message: "Internal Server Error" },
                 500
