@@ -2,6 +2,7 @@ import { OpenAPIHono } from '@hono/zod-openapi'
 import { swaggerUI } from '@hono/swagger-ui'
 import { logger } from 'hono/logger'
 import { secureHeaders } from 'hono/secure-headers'
+import 'dotenv/config'
 
 import { corsConfig } from './config/cors.config'
 import { rateLimiterConfig } from './config/rateLimiter.config'
