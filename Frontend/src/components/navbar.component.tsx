@@ -1,21 +1,25 @@
 import { AppBar, Toolbar, Box, Avatar, Button, Stack } from "@mui/material";
 import { MdLogout } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import axiosInstance from "../services/axios/axiosInstances";
-import logo from "../../public/assets/30SIT.png";
+import logo from "/assets/30SIT.png";
+import { useSelector } from "react-redux";
 
-interface NavbarProps {
-  userName?: string;
-  userInitial?: string;
-}
+import type { RootState } from "../store/store";
+import { logout } from "../store/slices/authSlices";
+import { useAppDispatch } from "../hooks/redux";
 
-export default function Navbar({ userName = "Nannicha", userInitial = "N" }: NavbarProps) {
+import { Logout } from "../services/apis/user.api";
+
+export default function Navbar() {
   const navigate = useNavigate();
+  const firstname = useSelector((state: RootState) => state.auth.firstname);
+  const dispatch = useAppDispatch();
 
   const handleLogout = async () => {
     try {
-      const res = await axiosInstance.get("/user/logout");
-      if (res.status === 200) {
+      const res = await Logout();
+      if (res?.status === 200) {
+        dispatch(logout());
         navigate("/login");
       }
     } catch (error) {
@@ -40,10 +44,10 @@ export default function Navbar({ userName = "Nannicha", userInitial = "N" }: Nav
         }}
       >
         {/* Logo Section */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <img 
-            src={logo} 
-            alt="SIT 30 Anniversary" 
+        <Box onClick={() => navigate("/")} sx={{ display: "flex", alignItems: "center", gap: 1, cursor: "pointer" }}>
+          <img
+            src={logo}
+            alt="SIT 30 Anniversary"
             style={{ height: 45, width: "auto" }}
           />
         </Box>
@@ -51,23 +55,23 @@ export default function Navbar({ userName = "Nannicha", userInitial = "N" }: Nav
         {/* Right Section - Avatar & Logout */}
         <Stack
           direction="row"
-          spacing={2}
-          sx={{ display: "flex", alignItems: "center" }}
+          spacing={3}
+          sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
         >
           <Stack direction="row" spacing={1} sx={{ display: "flex", alignItems: "center" }}>
             <Avatar
               sx={{
-                backgroundColor: "#2563eb",
+                background: "#0C86FE",
                 color: "#fff",
                 fontWeight: 600,
                 width: 40,
                 height: 40,
               }}
             >
-              {userInitial}
+              {firstname?.charAt(0).toUpperCase() || "?"}
             </Avatar>
-            <Box sx={{ color: "#1e293b", fontWeight: 500, fontSize: "0.95rem" }}>
-              {userName}
+            <Box sx={{ color: "#1e293b", fontWeight: 500, fontSize: "18px", display: { xs: "none", sm: "block" } }}>
+              {firstname}
             </Box>
           </Stack>
 
@@ -81,6 +85,7 @@ export default function Navbar({ userName = "Nannicha", userInitial = "N" }: Nav
               borderColor: "#fecaca",
               textTransform: "none",
               fontWeight: 500,
+              p: "5px 12px",
               "&:hover": {
                 backgroundColor: "#fee2e2",
                 borderColor: "#ef4444",

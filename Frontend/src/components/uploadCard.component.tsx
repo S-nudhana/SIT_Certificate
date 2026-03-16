@@ -49,7 +49,7 @@ export default function UploadCard({
         transition: "all 0.2s ease",
         "&:hover": {
           backgroundColor: "#f0f4f7",
-          borderColor: "#2563eb",
+          borderColor: "#0C86FE",
         },
       }}
     >
@@ -96,7 +96,7 @@ export default function UploadCard({
               sx={{
                 color: "#94a3b8",
                 fontSize: "0.75rem",
-            }}
+              }}
             >
               {acceptedFormats}
             </Typography>
