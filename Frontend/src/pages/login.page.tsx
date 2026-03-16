@@ -1,7 +1,7 @@
 import { Button, Container, Typography, Box, Divider } from "@mui/material";
 import { FcGoogle } from "react-icons/fc";
 
-import logo from "../../public/assets/30SIT.png";
+import logo from "/assets/30SIT.png";
 
 export default function Login() {
 

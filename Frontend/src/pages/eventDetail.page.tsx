@@ -12,13 +12,14 @@ import {
   MdEdit,
   MdDescription,
   MdGroup,
+  MdTipsAndUpdates,
   MdSettings,
   MdDelete,
   MdUploadFile,
 } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
-
-import { createEventAPI } from "../services/apis/event.api";
+import { useNavigate, useParams } from "react-router-dom";
+import { mockActivities } from "../data/mockData";
+import type { Activity } from "../data/mockData";
 
 import Navbar from "../components/navbar.component";
 import StatusBadge from "../components/statusBadge.component";
@@ -31,9 +32,13 @@ import type { FieldConfig } from "../types/event/eventDetail.type";
 
 export default function EventDetailPage() {
   const navigate = useNavigate();
-  const now = new Date();
+  const { id } = useParams();
 
-  const [activityName, setActivityName] = useState("ชื่อกิจกรรม");
+  const [activity] = useState<Activity | null>(
+    mockActivities.find((a) => a.id === id) || null
+  );
+
+  const [activityName, setActivityName] = useState(activity?.title || "");
   const [isEditingName, setIsEditingName] = useState(false);
 
   const [pdfFile, setPdfFile] = useState<File | undefined>();
@@ -72,26 +77,19 @@ export default function EventDetailPage() {
     console.log({ fieldConfig });
   };
 
-  const handleCreateEvent = async () => {
-    try {
-      const res = await createEventAPI({
-        title: activityName,
-        pdfFile: pdfFile!,
-        excelFile: excelFile!,
-        fontSize: fieldConfig.fontSize,
-        textX: fieldConfig.left,
-        textY: fieldConfig.top,
-      });
-      if (res.status === 201) {
-        alert("สร้างกิจกรรมสำเร็จ!");
-        navigate("/event/" + res.data.data.eventID);
-        return;
-      }
-      alert("เกิดข้อผิดพลาดในการสร้างกิจกรรม");
-    } catch (error) {
-      console.error("Error creating event:", error);
-      alert("เกิดข้อผิดพลาดในการสร้างกิจกรรม");
-    }
+  const handleGenerateCertificates = () => {
+    console.log("Generating certificates...");
+  };
+
+  if (!activity) {
+    return (
+      <Box sx={{ backgroundColor: "#f9fafb", minHeight: "100vh" }}>
+        <Navbar />
+        <Container maxWidth="lg" sx={{ py: 6 }}>
+          <Typography variant="h5">ไม่พบกิจกรรม</Typography>
+        </Container>
+      </Box>
+    );
   }
 
   return (
@@ -145,10 +143,10 @@ export default function EventDetailPage() {
                       <MdEdit size={16} />
                     </Button>
                   </Box>
-                  <StatusBadge status="Draft" size="large" />
+                  <StatusBadge status={activity.status} size="large" />
                 </Box>
                 <Typography variant="caption" sx={{ color: "#94a3b8", fontSize: "0.75rem" }}>
-                  สร้าง {now.toLocaleDateString()}
+                  สร้าง {activity.createdAt} • แก้ไขล่าสุด {activity.updatedAt}
                 </Typography>
               </Box>
             </Box>
@@ -507,13 +505,53 @@ export default function EventDetailPage() {
                 </Stack>
               </Box>
             </Paper>
-            <Box sx={{ pt: "20px" }}>
-              <ButtonComponent startIcon={<MdSettings size={16} />}
-                onclick={handleCreateEvent}
-                text="สร้างกิจกรรม"
-                width="100%" />
-            </Box>
           </Box>
+
+          {/* Generate Section */}
+          <Paper
+            sx={{
+              p: 2.5,
+              borderRadius: "12px",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+            }}
+          >
+            <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 2, alignItems: "center", justifyContent: "space-between" }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                <MdTipsAndUpdates size={18} style={{ color: "#0C86FE" }} />
+                <Typography sx={{ fontSize: "16px", fontWeight: 600, color: "#1e293b" }}>
+                  สร้างและดาวน์โหลดใบประกาศนียบัตรทั้งหมด
+                </Typography>
+              </Box>
+              <ButtonComponent
+                endIcon={<MdTipsAndUpdates size={16} />}
+                onclick={handleGenerateCertificates}
+                text="สร้างใบประกาศนียบัตร"
+                width={{ xs: "100%", md: "auto" }}
+              />
+            </Box>
+          </Paper>
+
+          {/* Send Email Section (disabled) */}
+          <Paper
+            sx={{
+              p: 2.5,
+              borderRadius: "12px",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+              opacity: 0.6,
+            }}
+          >
+            <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, justifyContent: { xs: "start", md: "space-between" }, alignItems: { xs: "start", md: "center" } }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                <MdDescription size={18} style={{ color: "#cbd5e1" }} />
+                <Typography sx={{ fontSize: "16px", fontWeight: 600, color: "#94a3b8" }}>
+                  ส่งใบประกาศนียบัตร
+                </Typography>
+              </Box>
+              <Typography sx={{ color: "#cbd5e1", display: "block", mt: 0.25 }}>
+                เร็ว ๆ นี้ — ส่งใบประกาศนียบัตรทางอีเมลหลังจากลงนาม
+              </Typography>
+            </Box>
+          </Paper>
         </Stack >
       </Container >
     </Box >

@@ -1,76 +1,84 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Container,
   TextField,
-  Button,
   Typography,
-  Paper,
   Stack,
   InputAdornment,
 } from "@mui/material";
-import { MdAdd, MdSearch, MdGroup } from "react-icons/md";
+import { MdAdd, MdSearch } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+
+
+import { getAllEventsAPI } from "../services/apis/event.api";
+
 import Navbar from "../components/navbar.component";
-import StatusBadge from "../components/statusBadge.component";
-import { mockActivities } from "../data/mockData";
-import type { Activity } from "../data/mockData";
+import ButtonComponent from "../components/button.component";
+import EventCard from "../components/eventCard.component";
 
 export default function Homepage() {
   const navigate = useNavigate();
-  const [activities, setActivities] = useState<Activity[]>(mockActivities);
+  const [activities, setActivities] = useState<any>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredActivities = activities.filter((activity) =>
-    activity.title.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredActivities = activities.filter((activity: any) =>
+    activity.eventTitle.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleActivityClick = (activityId: string) => {
-    navigate(`/activity/${activityId}`);
-  };
-
   const handleCreateActivity = () => {
-    const newActivity: Activity = {
-      id: String(Math.max(...activities.map((a) => parseInt(a.id)), 0) + 1),
-      title: `New Activity ${new Date().getTime()}`,
-      participants: 0,
-      status: "draft",
-      createdAt: new Date().toLocaleDateString("th-TH"),
-      updatedAt: new Date().toLocaleDateString("th-TH"),
-    };
-    setActivities([newActivity, ...activities]);
+    navigate("/event/create");
   };
 
-  const getStatusBadge = (status: string) => {
-    return <StatusBadge status={status} size="small" />;
+  const fetchEvents = async () => {
+    try {
+      const res = await getAllEventsAPI();
+      console.log(res.data)
+      setActivities(res.data.data.events);
+    } catch (error) {
+      console.error("Failed to fetch events:", error);
+    }
   };
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
 
   return (
     <Box sx={{ backgroundColor: "#f9fafb", minHeight: "100vh" }}>
       {/* Navbar */}
-      <Navbar userName="Nannicha" userInitial="N" />
+      <Navbar />
 
       {/* Hero Section */}
       <Box sx={{ textAlign: "center", py: 8, px: 2 }}>
-        <Typography
-          sx={{
-            fontSize: { xs: "2.5rem", md: "3.5rem" },
+        <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", gap: "10px" }}>
+          <Typography sx={{
+            fontSize: { xs: "40px", md: "48px" },
             fontWeight: 700,
             color: "#111827",
-            mb: 2,
-            fontFamily: "'Inter', sans-serif",
-          }}
-        >
-          SIT <span style={{ color: "#3b82f6" }}>Certificate</span>
-        </Typography>
+          }}>
+            SIT
+          </Typography>
+          <Typography
+            sx={{
+              fontSize: { xs: "40px", md: "48px" },
+              fontWeight: "bold",
+              background: "linear-gradient(90deg, #0048FF, #44B0FF)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent"
+            }}
+          >
+            Certificate
+          </Typography>
+        </Box>
         <Typography
           sx={{
-            fontSize: "1rem",
+            fontSize: "18px",
             color: "#6b7280",
             mb: 4,
           }}
         >
-          จัดการชุดใบประกาศนียบัตร
+          ระบบจัดการชุดใบประกาศนียบัตร
         </Typography>
 
         {/* Search */}
@@ -98,30 +106,23 @@ export default function Homepage() {
                 paddingLeft: 2,
               },
             }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <MdSearch size={20} color="#9ca3af" />
-                </InputAdornment>
-              ),
-            }}
-          />
-          <Button
-            variant="contained"
-            sx={{
-              backgroundColor: "#3b82f6",
-              color: "#fff",
-              textTransform: "none",
-              fontWeight: 600,
-              borderRadius: "9999px",
-              px: 3,
-              "&:hover": {
-                backgroundColor: "#2563eb",
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <MdSearch size={20} color="#9ca3af" />
+                  </InputAdornment>
+                ),
               },
             }}
-          >
-            ค้นหา
-          </Button>
+          />
+          <ButtonComponent
+            startIcon={<MdSearch />}
+            endIcon={null}
+            text="ค้นหา"
+            width="100px"
+            rounded
+          />
         </Box>
       </Box>
 
@@ -140,34 +141,23 @@ export default function Homepage() {
           <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
             <Box
               sx={{
-                width: 4,
-                height: 24,
-                backgroundColor: "#3b82f6",
+                width: 5,
+                height: 30,
+                background: "linear-gradient(180deg, #557fe8, #44B0FF)",
                 borderRadius: "9999px",
               }}
             />
-            <Typography sx={{ fontSize: "1.125rem", fontWeight: 700, color: "#111827" }}>
+            <Typography sx={{ fontSize: "24px", fontWeight: 700, color: "#111827" }}>
               กิจกรรม
             </Typography>
           </Stack>
-          <Button
+          <ButtonComponent
             startIcon={<MdAdd size={18} />}
-            variant="contained"
-            onClick={handleCreateActivity}
-            sx={{
-              backgroundColor: "#3b82f6",
-              color: "#fff",
-              textTransform: "none",
-              fontWeight: 600,
-              borderRadius: "9999px",
-              px: 3,
-              "&:hover": {
-                backgroundColor: "#2563eb",
-              },
-            }}
-          >
-            สร้างกิจกรรม
-          </Button>
+            onclick={handleCreateActivity}
+            text="สร้างกิจกรรม"
+            width="150px"
+            rounded
+          />
         </Stack>
 
         {/* Activity Cards Grid */}
@@ -182,75 +172,15 @@ export default function Homepage() {
             gap: 2.5,
           }}
         >
-          {filteredActivities.map((activity) => (
-            <Paper
-              key={activity.id}
-              onClick={() => handleActivityClick(activity.id)}
-              sx={{
-                backgroundColor: "#fff",
-                borderRadius: "1rem",
-                overflow: "hidden",
-                boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
-                border: "1px solid #f3f4f6",
-                transition: "all 0.2s ease",
-                cursor: "pointer",
-                "&:hover": {
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                  transform: "translateY(-2px)",
-                },
-              }}
-            >
-              {/* Image */}
-              <Box
-                sx={{
-                  backgroundColor: "#f3f4f6",
-                  height: 176,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              />
-
-              {/* Content */}
-              <Box sx={{ p: 4 }}>
-                <Stack spacing={3}>
-                  {/* Title */}
-                  <Typography
-                    sx={{
-                      fontSize: "0.875rem",
-                      fontWeight: 600,
-                      color: "#111827",
-                      display: "-webkit-box",
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden",
-                      lineHeight: 1.4,
-                    }}
-                  >
-                    {activity.title}
-                  </Typography>
-
-                  {/* Participants */}
-                  <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
-                    <MdGroup size={16} color="#6b7280" />
-                    <Typography
-                      sx={{
-                        fontSize: "0.75rem",
-                        color: "#6b7280",
-                        fontWeight: 500,
-                      }}
-                    >
-                      {activity.participants} ผู้เข้าร่วม
-                    </Typography>
-                  </Stack>
-
-                  {/* Status Badge */}
-                  <Box sx={{ display: "flex", justifyContent: "flex-start" }}>
-                    {getStatusBadge(activity.status)}
-                  </Box>
-                </Stack>
-              </Box>
-            </Paper>
+          {filteredActivities.map((activity: any) => (
+            <EventCard
+              key={activity.eventID}
+              id={activity.eventID}
+              imageSrc={activity.eventCertificate}
+              title={activity.eventTitle}
+              participants={activity.eventParticipant}
+              status={activity.eventStatus}
+            />
           ))}
         </Box>
       </Container>

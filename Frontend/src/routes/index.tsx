@@ -2,14 +2,19 @@ import { createBrowserRouter } from "react-router-dom";
 
 import Homepage from "../pages/home.page";
 import Login from "../pages/login.page";
-import ActivityDetailPage from "../pages/activityDetail.page";
+import ActivityDetailPage from "../pages/eventDetail.page";
 import CreateEvent from "../pages/createEvent.page";
-import ProtectedRoute from "../middleware/protectedRoute.components";
+import ProtectedRoute from "../middleware/protectedRoute.middleware";
+import PublicRoute from "../middleware/publicRoute.middleware";
 
 export const router = createBrowserRouter([
   {
     path: "/login",
-    element: <Login />,
+    element: (
+      <PublicRoute>
+        <Login />
+      </PublicRoute>
+    ),
   },
   {
     path: "/",
@@ -20,7 +25,7 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: "/activity/:id",
+    path: "/event/:id",
     element: (
       <ProtectedRoute>
         <ActivityDetailPage />
@@ -28,7 +33,7 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: "/events/create",
+    path: "/event/create",
     element: (
       <ProtectedRoute>
         <CreateEvent />

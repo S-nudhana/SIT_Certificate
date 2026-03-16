@@ -1,10 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import { MdDescription, MdEdit, MdCheckCircle } from "react-icons/md";
 
-interface StatusBadgeProps {
-  status: string;
-  size?: "small" | "large";
-}
+import type { StatusBadgeProps } from "../types/components.type";
 
 export default function StatusBadge({ status, size = "large" }: StatusBadgeProps) {
   const isSmall = size === "small";
@@ -25,7 +22,7 @@ export default function StatusBadge({ status, size = "large" }: StatusBadgeProps
   } as const;
 
   switch (status) {
-    case "draft":
+    case "created":
       return (
         <Box
           sx={{
@@ -40,13 +37,13 @@ export default function StatusBadge({ status, size = "large" }: StatusBadgeProps
           </Typography>
         </Box>
       );
-    case "awaiting-signature":
+    case "cert_generated":
       return (
         <Box
           sx={{
             ...baseStyles,
             backgroundColor: "#fed7aa",
-            border: "1px solid #fed7aa",
+            border: "1px solid #ea580c",
           }}
         >
           <MdEdit size={iconSize} style={{ color: "#ea580c" }} />
@@ -55,7 +52,7 @@ export default function StatusBadge({ status, size = "large" }: StatusBadgeProps
           </Typography>
         </Box>
       );
-    case "completed":
+    case "signed":
       return (
         <Box
           sx={{
