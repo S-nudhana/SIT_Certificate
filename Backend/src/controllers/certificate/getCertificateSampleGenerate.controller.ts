@@ -1,44 +1,40 @@
 import { Context } from "hono"
-import fs from "fs/promises"
-import path from "path"
 
-import { getCertificateGenerateSchema } from "../../validators/certificate.validators"
-import { getEventCertificateTemplateExcelModel } from "../../models/event.model"
-import { insertCertificateRecord } from "../../models/certificate.model"
+import { getCertificateSampleGenerateSchema } from "../../validators/certificate.validators"
 import { fetchAndFillCertificate } from "../../utils/certificate"
 
 export default async function getEventCertificateSampleGenerate(c: Context) {
     try {
-        const eventID = c.req.param("id")
-        const result = getCertificateGenerateSchema.safeParse({ eventID })
+        const body = await c.req.parseBody()
+        const textXPos = Number(body.textXPos)
+        const textYPos = Number(body.textYPos)
+        const textSize = Number(body.textSize)
+        const result = getCertificateSampleGenerateSchema.safeParse({ textXPos, textYPos, textSize })
         if (!result.success) {
             return c.json({
                 message: "Input Format is Invalid"
             }, 400)
         }
-
-        const template = await getEventCertificateTemplateExcelModel(result.data.eventID)
-        if (!template) {
+        const certTemplate = body.certTemplate as File
+        if (!certTemplate) {
             return c.json({
-                message: "Certificate or Excel template not found for the event"
-            }, 404)
+                message: "Files are required"
+            }, 400)
         }
-
-        const pdfPath = template.certificateTemplate
-        if (!pdfPath) {
+        if (certTemplate.type !== "application/pdf") {
             return c.json({
-                message: "Certificate template not found for the event"
-            }, 404)
+                message: "Certificate template must be a PDF file"
+            }, 400)
         }
-        const pdfBytes = await fs.readFile(pdfPath)
+        const pdfBuffer = Buffer.from(await certTemplate.arrayBuffer())
         const certificate: Buffer | null =
             await fetchAndFillCertificate(
-                pdfBytes,
-                "John",
-                "Doe",
-                template.textYPosition,
-                template.textXPosition,
-                template.textSize
+                pdfBuffer,
+                "สมชาย",
+                "ส่ายหน้า",
+                result.data.textYPos,
+                result.data.textXPos,
+                result.data.textSize
             )
 
         if (!certificate) {

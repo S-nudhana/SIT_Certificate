@@ -13,4 +13,5 @@ export interface UserAuthQuery extends RowDataPacket {
 
 export interface UserRoleResponse {
     userRole: string
+    userFirstname: string
 }

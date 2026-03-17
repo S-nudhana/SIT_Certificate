@@ -5,8 +5,6 @@ import getEvent from '../controllers/event/getEvent.controller'
 import createEvent from '../controllers/event/createEvent.controller'
 import updateEvent from '../controllers/event/updateEvent.controller'
 import deleteEvent from '../controllers/event/deleteEvent.controller'
-import getEventCertificateGenerate from '../controllers/certificate/getCertificateGenerate.controller'
-import getEventCertificateDownload from '../controllers/certificate/getCertificateDownload.controller'
 
 import authMiddleware from '../middlewares/auth.middleware'
 
@@ -25,7 +23,7 @@ import {
 
 const event = new OpenAPIHono()
 
-event.use('/', authMiddleware(['admin', 'professor']))
+event.use('/', authMiddleware(['ADMIN', 'PROFESSOR']))
 const getEventsRoute = createRoute({
     method: 'get',
     path: '/',
@@ -59,70 +57,70 @@ const getEventsRoute = createRoute({
 })
 event.openapi(getEventsRoute, getEvents)
 
-event.use('/:id', authMiddleware(['admin', 'professor']))
-const getEventRoute = createRoute({
-    method: 'get',
-    path: '/{id}',
-    tags: ['Event'],
-    request: {
-        params: z.object({
-            id: z.string()
-        })
-    },
-    responses: {
-        200: {
-            description: 'Get event detail',
-            content: {
-                'application/json': {
-                    schema: apiResponse(
-                        z.object({
-                            event: eventGetByIDResponseSchema
-                        })
-                    )
-                }
-            }
-        },
-        400: {
-            description: 'Invalid request',
-            content: {
-                'application/json': {
-                    schema: apiResponse(
-                        z.object({
-                            event: eventGetByIDResponseSchema.nullable()
-                        })
-                    )
-                }
-            }
-        },
-        404: {
-            description: 'Event not found',
-            content: {
-                'application/json': {
-                    schema: apiResponse(
-                        z.object({
-                            event: eventGetByIDResponseSchema.nullable()
-                        })
-                    )
-                }
-            }
-        },
-        500: {
-            description: 'Internal Server Error',
-            content: {
-                'application/json': {
-                    schema: apiResponse(
-                        z.object({
-                            event: eventGetByIDResponseSchema.nullable()
-                        })
-                    )
-                }
-            }
-        }
-    },
-})
-event.openapi(getEventRoute, getEvent)
+// event.use('/:id', authMiddleware(['ADMIN', 'PROFESSOR']))
+// const getEventRoute = createRoute({
+//     method: 'get',
+//     path: '/{id}',
+//     tags: ['Event'],
+//     request: {
+//         params: z.object({
+//             id: z.string()
+//         })
+//     },
+//     responses: {
+//         200: {
+//             description: 'Get event detail',
+//             content: {
+//                 'application/json': {
+//                     schema: apiResponse(
+//                         z.object({
+//                             event: eventGetByIDResponseSchema
+//                         })
+//                     )
+//                 }
+//             }
+//         },
+//         400: {
+//             description: 'Invalid request',
+//             content: {
+//                 'application/json': {
+//                     schema: apiResponse(
+//                         z.object({
+//                             event: eventGetByIDResponseSchema.nullable()
+//                         })
+//                     )
+//                 }
+//             }
+//         },
+//         404: {
+//             description: 'Event not found',
+//             content: {
+//                 'application/json': {
+//                     schema: apiResponse(
+//                         z.object({
+//                             event: eventGetByIDResponseSchema.nullable()
+//                         })
+//                     )
+//                 }
+//             }
+//         },
+//         500: {
+//             description: 'Internal Server Error',
+//             content: {
+//                 'application/json': {
+//                     schema: apiResponse(
+//                         z.object({
+//                             event: eventGetByIDResponseSchema.nullable()
+//                         })
+//                     )
+//                 }
+//             }
+//         }
+//     },
+// })
+// event.openapi(getEventRoute, getEvent)
 
-event.use('/', authMiddleware(['admin']))
+event.use('/', authMiddleware(['ADMIN', 'PROFESSOR']))
 const createEventRoute = createRoute({
     method: 'post',
     path: '/',
@@ -184,7 +182,7 @@ const createEventRoute = createRoute({
 })
 event.openapi(createEventRoute, createEvent)
 
-event.use('/:id', authMiddleware(['admin']))
+event.use('/:id', authMiddleware(['ADMIN', 'PROFESSOR']))
 const updateEventRoute = createRoute({
     method: 'put',
     path: '/{id}',

@@ -1,14 +1,14 @@
-import { PDFDocument, rgb } from "pdf-lib";
+import { PDFDocument, rgb, degrees } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 import { promises as fs } from "fs";
 
 export const fetchAndFillCertificate = async (
-    pdfBytes: Buffer,
-    name: string,
-    surname: string,
-    textYPosition: number,
-    textXPosition: number,
-    textSize: number
+  pdfBytes: Buffer,
+  name: string,
+  surname: string,
+  textYPosition: number,
+  textXPosition: number,
+  textSize: number
 ): Promise<Buffer | null> => {
   try {
     const pdfDoc = await PDFDocument.load(pdfBytes);
@@ -18,17 +18,24 @@ export const fetchAndFillCertificate = async (
     const thaiFont = await pdfDoc.embedFont(fontBytes);
 
     const page = pdfDoc.getPages()[0];
+    page.setRotation(degrees(0));
+
     const text = `${name} ${surname}`;
     const fontSize = textSize;
     const { width, height } = page.getSize();
 
     const textWidth = thaiFont.widthOfTextAtSize(text, fontSize);
-    const x = (width - textWidth) / 2 + (textXPosition || 0);
-    const y = height * (textYPosition / 100);
+
+    const x = (width * (textXPosition / 100)) - (textWidth / 2);
+
+    const y =
+      height -
+      (height * (textYPosition / 100)) -
+      (fontSize / 2);
 
     page.drawText(text, {
-      x: x,
-      y: y,
+      x,
+      y,
       size: fontSize,
       font: thaiFont,
       color: rgb(0, 0, 0),

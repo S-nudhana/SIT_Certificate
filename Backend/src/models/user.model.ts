@@ -14,9 +14,10 @@ export async function findUserByEmail(email: string): Promise<UserAuthQuery | nu
 
 export async function findUserRoleById(user_id: string): Promise<UserRoleResponse | null> {
     try {
-        const [rows] = await db.query<UserAuthQuery[]>(`SELECT user_role FROM users WHERE user_id = ?`, [user_id])
+        const [rows] = await db.query<UserAuthQuery[]>(`SELECT user_role, user_firstname FROM users WHERE user_id = ?`, [user_id])
         return {
-            userRole: rows[0].user_role
+            userRole: rows[0].user_role,
+            userFirstname: rows[0].user_firstname
         }
     } catch (error) {
         console.error(error)

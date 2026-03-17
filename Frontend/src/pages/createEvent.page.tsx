@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Box,
   Button,
@@ -18,7 +18,7 @@ import {
 } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 
-import { createEventAPI } from "../services/apis/event.api";
+import { createEventAPI, getSampleCertificateAPI } from "../services/apis/event.api";
 
 import Navbar from "../components/navbar.component";
 import StatusBadge from "../components/statusBadge.component";
@@ -26,8 +26,6 @@ import BackBTN from "../components/backBTN.component";
 import PdfViewer from "../components/PDFViewer.component";
 import ButtonComponent from "../components/button.component";
 import XLSXViewer from "../components/XLSXViewer.component";
-
-import type { FieldConfig } from "../types/event/eventDetail.type";
 
 export default function EventDetailPage() {
   const navigate = useNavigate();
@@ -37,26 +35,35 @@ export default function EventDetailPage() {
   const [isEditingName, setIsEditingName] = useState(false);
 
   const [pdfFile, setPdfFile] = useState<File | undefined>();
-  const [pdfUrl, setPdfUrl] = useState<string | null>();
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [excelFile, setExcelFile] = useState<File | undefined>();
   const [excelUrl, setExcelUrl] = useState<string | null>();
 
-  const [fieldConfig, setFieldConfig] = useState<FieldConfig>({
-    fontSize: 24,
-    top: 50,
-    left: 50,
+  const [sampleCertificateUrl, setSampleCertificateUrl] = useState<string | null>();
+
+  const [fieldConfig, setFieldConfig] = useState({
+    fontSize: "24",
+    top: "50",
+    left: "50",
   });
 
   const pdfInputRef = useRef<HTMLInputElement>(null);
   const excelInputRef = useRef<HTMLInputElement>(null);
 
   const handleDrop =
-    (type: "pdf" | "excel") => (e: React.DragEvent<HTMLDivElement>) => {
+    (type: "pdf" | "excel") => async (e: React.DragEvent<HTMLDivElement>) => {
       e.preventDefault();
       const file = e.dataTransfer.files[0];
       if (!file) return;
-      if (type === "pdf") setPdfFile(file);
-      else setExcelFile(file);
+      if (type === "pdf") {
+        setPdfFile(file);
+        setPdfUrl(URL.createObjectURL(file));
+        handleSampleCertificate(file);
+      }
+      else {
+        setExcelFile(file);
+        setExcelUrl(URL.createObjectURL(file));
+      }
     };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) =>
@@ -68,8 +75,25 @@ export default function EventDetailPage() {
     }
   };
 
-  const handleConfirm = () => {
-    console.log({ fieldConfig });
+  const handleSampleCertificate = async (file: File) => {
+    try {
+      const res = await getSampleCertificateAPI({
+        pdfFile: file,
+        fontSize: Number(fieldConfig.fontSize),
+        left: Number(fieldConfig.left),
+        top: Number(fieldConfig.top),
+      });
+
+      if (res.status === 200) {
+        const blob = new Blob([res.data], { type: "application/pdf" });
+        const url = URL.createObjectURL(blob);
+        setSampleCertificateUrl(url);
+        return;
+      }
+    } catch (error) {
+      console.error("Error fetching sample certificate:", error);
+      alert("เกิดข้อผิดพลาดในการดึงตัวอย่างใบประกาศนียบัตร");
+    }
   };
 
   const handleCreateEvent = async () => {
@@ -78,9 +102,9 @@ export default function EventDetailPage() {
         title: activityName,
         pdfFile: pdfFile!,
         excelFile: excelFile!,
-        fontSize: fieldConfig.fontSize,
-        textX: fieldConfig.left,
-        textY: fieldConfig.top,
+        fontSize: Number(fieldConfig.fontSize),
+        textX: Number(fieldConfig.left),
+        textY: Number(fieldConfig.top),
       });
       if (res.status === 201) {
         alert("สร้างกิจกรรมสำเร็จ!");
@@ -94,6 +118,18 @@ export default function EventDetailPage() {
     }
   }
 
+  useEffect(() => {
+    return () => {
+      if (pdfUrl) URL.revokeObjectURL(pdfUrl);
+    };
+  }, [pdfUrl]);
+
+  useEffect(() => {
+    return () => {
+      if (sampleCertificateUrl) URL.revokeObjectURL(sampleCertificateUrl);
+    };
+  }, [sampleCertificateUrl]);
+
   return (
     <Box sx={{ backgroundColor: "#f9fafb", minHeight: "100vh" }}>
       <Navbar />
@@ -102,7 +138,6 @@ export default function EventDetailPage() {
           <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
             <Box sx={{ display: "flex", alignItems: "flex-start", gap: 2, flex: 1 }}>
               <BackBTN />
-
               <Box sx={{ flex: 1 }}>
                 <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, alignItems: { xs: "flex-start", md: "center" }, gap: 1.5, mb: 1 }}>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -207,7 +242,7 @@ export default function EventDetailPage() {
                     variant="caption"
                     sx={{ fontSize: "16px", fontWeight: 600, color: "#1e293b" }}
                   >
-                    เทมเพลต
+                    เทมเพลต <span style={{ color: "red" }}>*</span>
                   </Typography>
                 </Box>
 
@@ -215,21 +250,24 @@ export default function EventDetailPage() {
                 <Box sx={{ minHeight: "300px", height: "100%" }}>
                   {pdfFile ? (
                     <Box sx={{ width: "100%", gap: 2 }}>
-                      <PdfViewer key={pdfUrl} fileUrl={pdfUrl || ""} />
-                      <ButtonComponent startIcon={<MdUploadFile />} text="อัปโหลดไฟล์ใบประกาศนียบัตรใหม่" width="100%" onclick={() => pdfInputRef.current?.click()} />
-                      <input
-                        ref={pdfInputRef}
-                        type="file"
-                        accept=".pdf"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (!file) return;
+                      {pdfUrl && <PdfViewer key={pdfUrl} fileUrl={pdfUrl} />}
+                      <Box sx={{ pt: '20px' }}>
+                        <ButtonComponent startIcon={<MdUploadFile />} text="อัปโหลดไฟล์ใบประกาศนียบัตรใหม่" width="100%" onclick={() => pdfInputRef.current?.click()} />
+                        <input
+                          ref={pdfInputRef}
+                          type="file"
+                          accept=".pdf"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
 
-                          setPdfFile(file);
-                          setPdfUrl(URL.createObjectURL(file));
-                        }}
-                        style={{ display: "none" }}
-                      />
+                            setPdfFile(file);
+                            setPdfUrl(URL.createObjectURL(file));
+                            handleSampleCertificate(file);
+                          }}
+                          style={{ display: "none" }}
+                        />
+                      </Box>
                     </Box>
                   ) : (
                     <Box
@@ -260,12 +298,13 @@ export default function EventDetailPage() {
                         ref={pdfInputRef}
                         type="file"
                         accept=".pdf"
-                        onChange={(e) => {
+                        onChange={async (e) => {
                           const file = e.target.files?.[0];
                           if (!file) return;
 
                           setPdfFile(file);
                           setPdfUrl(URL.createObjectURL(file));
+                          handleSampleCertificate(file);
                         }}
                         style={{ display: "none" }}
                       />
@@ -305,7 +344,7 @@ export default function EventDetailPage() {
                     รายชื่อผู้เข้าร่วม
                   </Typography>
                 </Box>
-                <Box sx={{ height: { xs: "300px", md: "415px" }, width: { xs: "calc(100vw - 63px)", md: "100%" }, }}>
+                <Box sx={{ height: { xs: "300px", md: "435px" }, width: { xs: "calc(100vw - 63px)", md: "100%" }, }}>
                   {excelFile ? (
                     <Box
                       sx={{
@@ -423,35 +462,39 @@ export default function EventDetailPage() {
             >
               <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "2fr 1fr" }, gap: 3 }}>
                 {/* Preview */}
-                <Box
-                  sx={{
-                    border: "2px dashed #e2e8f0",
-                    borderRadius: "8px",
-                    backgroundColor: "#f0f4f8",
-                    minHeight: "280px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    position: "relative",
-                    overflow: "hidden",
-                  }}
-                >
-                  <Typography
+                {sampleCertificateUrl ? (
+                  <PdfViewer key={sampleCertificateUrl} fileUrl={sampleCertificateUrl} />
+                ) : (
+                  <Box
                     sx={{
-                      position: "absolute",
-                      top: `${fieldConfig.top}%`,
-                      left: `${fieldConfig.left}%`,
-                      transform: "translate(-50%, -50%)",
-                      fontSize: `${Math.max(10, fieldConfig.fontSize * 0.6)}px`,
-                      color: "#94a3b8",
-                      fontWeight: 600,
-                      whiteSpace: "nowrap",
-                      userSelect: "none",
+                      border: "2px dashed #e2e8f0",
+                      borderRadius: "8px",
+                      backgroundColor: "#f0f4f8",
+                      minHeight: "280px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      position: "relative",
+                      overflow: "hidden",
                     }}
                   >
-                    Preview
-                  </Typography>
-                </Box>
+                    <Typography
+                      sx={{
+                        position: "absolute",
+                        top: `${fieldConfig.top}%`,
+                        left: `${fieldConfig.left}%`,
+                        transform: "translate(-50%, -50%)",
+                        fontSize: `${Math.max(10, Number(fieldConfig.fontSize) * 0.6)}px`,
+                        color: "#94a3b8",
+                        fontWeight: 600,
+                        whiteSpace: "nowrap",
+                        userSelect: "none",
+                      }}
+                    >
+                      Preview
+                    </Typography>
+                  </Box>
+                )}
 
                 {/* Controls */}
                 <Stack spacing={2}>
@@ -463,7 +506,10 @@ export default function EventDetailPage() {
                       type="number"
                       value={fieldConfig.fontSize}
                       onChange={(e) =>
-                        setFieldConfig((prev) => ({ ...prev, fontSize: Number(e.target.value) }))
+                        setFieldConfig((prev) => ({
+                          ...prev,
+                          fontSize: e.target.value
+                        }))
                       }
                       fullWidth
                       size="small"
@@ -475,10 +521,12 @@ export default function EventDetailPage() {
                     </Typography>
                     <TextField
                       type="number"
-                      inputProps={{ min: 1, max: 100 }}
                       value={fieldConfig.top}
                       onChange={(e) =>
-                        setFieldConfig((prev) => ({ ...prev, top: Number(e.target.value) }))
+                        setFieldConfig((prev) => ({
+                          ...prev,
+                          top: e.target.value
+                        }))
                       }
                       fullWidth
                       size="small"
@@ -486,14 +534,16 @@ export default function EventDetailPage() {
                   </Box>
                   <Box>
                     <Typography sx={{ fontSize: "14px", color: "#64748b", display: "block", mb: 0.5 }}>
-                      ความกว้าง (1-100%)
+                      ตำแหน่งแนวนอน (1-100%)
                     </Typography>
                     <TextField
                       type="number"
-                      inputProps={{ min: 1, max: 100 }}
                       value={fieldConfig.left}
                       onChange={(e) =>
-                        setFieldConfig((prev) => ({ ...prev, left: Number(e.target.value) }))
+                        setFieldConfig((prev) => ({
+                          ...prev,
+                          left: e.target.value
+                        }))
                       }
                       fullWidth
                       size="small"
@@ -501,10 +551,25 @@ export default function EventDetailPage() {
                   </Box>
                   <ButtonComponent
                     startIcon={<MdSettings size={16} />}
-                    onclick={handleConfirm}
+                    onclick={() => handleSampleCertificate(pdfFile!)}
                     text="ยืนยัน"
                   />
+
                 </Stack>
+                {/* <Button
+                  variant="contained"
+                  sx={{ mt: 2 }}
+                  onClick={() => {
+                    if (!sampleCertificateUrl) return;
+
+                    const a = document.createElement("a");
+                    a.href = sampleCertificateUrl;
+                    a.download = "sample-certificate.pdf";
+                    a.click();
+                  }}
+                >
+                  ดาวน์โหลดตัวอย่าง PDF
+                </Button> */}
               </Box>
             </Paper>
             <Box sx={{ pt: "20px" }}>

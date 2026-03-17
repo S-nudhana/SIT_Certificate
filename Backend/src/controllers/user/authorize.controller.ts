@@ -28,7 +28,7 @@ export default async function authorize(c: Context) {
         if (!userData) {
             return c.json({ data: { authorized: false, role: null }, message: "Unauthorized" }, 401)
         }
-        return c.json({ data: { authorized: true, role: userData.userRole }, message: "Authorized" }, 200)
+        return c.json({ data: { authorized: true, role: userData.userRole, userFirstname: userData.userFirstname }, message: "Authorized" }, 200)
     } catch (error) {
         console.error(error)
         return c.json({ data: { authorized: false, role: null }, message: "Internal Server Error" }, 500)

@@ -36,6 +36,7 @@ export default function authMiddleware(requiredRoles: string[] = []): Middleware
             }
             const userRole: UserRoleResponse | null = await findUserRoleById(tokenData.uid)
             if (!userRole || !requiredRoles.includes(userRole.userRole)) {
+                console.log(userRole)
                 return c.json(
                     { authorized: false, code: "UNAUTHORIZED", message: "Unauthorized" },
                     401
