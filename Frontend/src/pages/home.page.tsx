@@ -33,7 +33,6 @@ export default function Homepage() {
   const fetchEvents = async () => {
     try {
       const res = await getAllEventsAPI();
-      console.log(res.data)
       setActivities(res.data.data.events);
     } catch (error) {
       console.error("Failed to fetch events:", error);
@@ -53,7 +52,7 @@ export default function Homepage() {
       <Box sx={{ textAlign: "center", py: 8, px: 2 }}>
         <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", gap: "10px" }}>
           <Typography sx={{
-            fontSize: { xs: "40px", md: "48px" },
+            fontSize: { xs: "40px", md: "52px" },
             fontWeight: 700,
             color: "#111827",
           }}>
@@ -61,7 +60,7 @@ export default function Homepage() {
           </Typography>
           <Typography
             sx={{
-              fontSize: { xs: "40px", md: "48px" },
+              fontSize: { xs: "40px", md: "52px" },
               fontWeight: "bold",
               background: "linear-gradient(90deg, #0048FF, #44B0FF)",
               WebkitBackgroundClip: "text",

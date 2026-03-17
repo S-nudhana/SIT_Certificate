@@ -11,7 +11,7 @@ const certificate = new OpenAPIHono()
 certificate.use('/{id}/certificate/*', authMiddleware(['admin', 'professor']))
 const generateCertificateRoute = createRoute({
     method: 'get',
-    path: '/{id}/certificate/generate',
+    path: '/{id}/generate',
     tags: ['Certificate'],
     request: {
         params: z.object({
@@ -31,7 +31,7 @@ certificate.openapi(generateCertificateRoute, getEventCertificateGenerate)
 
 const downloadCertificateRoute = createRoute({
     method: 'get',
-    path: '/{id}/certificate/download',
+    path: '/{id}/download',
     tags: ['Certificate'],
     request: {
         params: z.object({
@@ -76,14 +76,10 @@ const downloadCertificateRoute = createRoute({
 certificate.openapi(downloadCertificateRoute, getEventCertificateDownload)
 
 const sampleCertificateRoute = createRoute({
-    method: 'get',
-    path: '/{id}/certificate/sample',
+    method: 'post',
+    path: '/sample',
     tags: ['Certificate'],
-    request: {
-        params: z.object({
-            id: z.string()
-        })
-    },
+    request: {},
     responses: {
         200: {
             description: 'Generate sample certificate',

@@ -9,7 +9,7 @@ export interface ButtonType {
     onclick?: () => void
 }
 
-
+    
 export interface EventCardProps {
     id?: string;
     title: string;

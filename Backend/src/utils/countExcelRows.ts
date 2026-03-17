@@ -1,12 +1,15 @@
+import path from "path"
 import * as XLSX from "xlsx"
 
-export function countExcelRows(filePath: string): number {
-    const workbook = XLSX.readFile(filePath)
+export function countExcelRows(filePath: string) {
 
-    const sheetName = workbook.SheetNames[0]
-    const sheet = workbook.Sheets[sheetName]
+    const fullPath = path.join(process.cwd(), filePath)
 
-    const data = XLSX.utils.sheet_to_json(sheet)
+    const workbook = XLSX.readFile(fullPath)
 
-    return data.length
+    const sheet = workbook.Sheets[workbook.SheetNames[0]]
+
+    const json = XLSX.utils.sheet_to_json(sheet)
+
+    return json.length
 }

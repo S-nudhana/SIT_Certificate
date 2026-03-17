@@ -6,3 +6,10 @@ export interface CreateEventPayload {
     textX: number
     textY: number
 }
+
+export interface GetSampleCertificatePayload {
+    pdfFile: File
+    fontSize: number
+    left: number
+    top: number
+}

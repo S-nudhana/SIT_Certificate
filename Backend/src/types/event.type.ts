@@ -4,8 +4,10 @@ export interface EventDetailQuery extends RowDataPacket {
     event_id: number
     event_title: string
     event_status: string
+    eventCertificate: string
     event_participant: number
     event_createAt: Date
+    event_updateAt: Date
 }
 
 export interface EventFullDetailQuery extends RowDataPacket {
@@ -16,6 +18,7 @@ export interface EventFullDetailQuery extends RowDataPacket {
     event_status: string
     event_participant: number
     event_createAt: Date
+    event_updateAt: Date
 }
 
 export interface EventGetCertificateTemplateQuery extends RowDataPacket {
@@ -33,18 +36,22 @@ export interface EventGetCertificateTemplateResponse {
 export interface EventGetAllResponse {
     eventID: number
     eventTitle: string
+    eventCertificate: string
     eventStatus: string
     eventParticipant: number
     eventCreateAt: Date
+    eventUpdateAt: Date
 }
 
 export interface EventGetByIDResponse {
     eventID: number
     eventTitle: string
     certificateURL: string
+    excelURL: string
     eventStatus: string
-    eventStartDate: Date
-    eventEndDate: Date
+    eventParticipant: number
+    eventCreateAt: Date
+    eventUpdateAt: Date
 }
 
 export interface EventGetByIDPayload {
