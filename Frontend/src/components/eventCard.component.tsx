@@ -21,7 +21,6 @@ export default function EventCard({
     navigate(`/event/${activityId}`);
   };
 
-  // ✅ Create + cleanup Blob URL properly
   useEffect(() => {
     if (!imageSrc) {
       setImageUrl(null);
@@ -37,7 +36,7 @@ export default function EventCard({
     setImageUrl(url);
 
     return () => {
-      URL.revokeObjectURL(url); // ✅ prevent memory leak
+      URL.revokeObjectURL(url);
     };
   }, [imageSrc]);
 

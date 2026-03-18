@@ -9,7 +9,7 @@ export interface ButtonType {
     onclick?: () => void
 }
 
-    
+
 export interface EventCardProps {
     id?: string;
     title: string;
@@ -22,4 +22,9 @@ export interface EventCardProps {
 export interface StatusBadgeProps {
     status: string
     size?: "small" | "large";
+}
+
+export interface HideOnScrollProps {
+    window?: () => Window;
+    children?: React.ReactElement<unknown>;
 }

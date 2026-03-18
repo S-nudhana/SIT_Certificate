@@ -18,7 +18,8 @@ import {
 } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 
-import { createEventAPI, getSampleCertificateAPI } from "../services/apis/event.api";
+import { createEventAPI } from "../services/apis/event.api";
+import { getSampleCertificateAPI } from "../services/apis/certificate.api";
 
 import Navbar from "../components/navbar.component";
 import StatusBadge from "../components/statusBadge.component";
@@ -250,7 +251,9 @@ export default function EventDetailPage() {
                 <Box sx={{ minHeight: "300px", height: "100%" }}>
                   {pdfFile ? (
                     <Box sx={{ width: "100%", gap: 2 }}>
-                      {pdfUrl && <PdfViewer key={pdfUrl} fileUrl={pdfUrl} />}
+                      {pdfUrl && <Box sx={{ width: "100%", maxWidth: 700 }}>
+                        <PdfViewer fileUrl={pdfUrl} />
+                      </Box>}
                       <Box sx={{ pt: '20px' }}>
                         <ButtonComponent startIcon={<MdUploadFile />} text="อัปโหลดไฟล์ใบประกาศนียบัตรใหม่" width="100%" onclick={() => pdfInputRef.current?.click()} />
                         <input
@@ -460,10 +463,12 @@ export default function EventDetailPage() {
                 boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
               }}
             >
-              <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "2fr 1fr" }, gap: 3 }}>
+              <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "2fr 1fr" }, gap: 9 }}>
                 {/* Preview */}
                 {sampleCertificateUrl ? (
-                  <PdfViewer key={sampleCertificateUrl} fileUrl={sampleCertificateUrl} />
+                  <Box sx={{ width: "100%", maxWidth: 700 }}>
+                    <PdfViewer fileUrl={sampleCertificateUrl} />
+                  </Box>
                 ) : (
                   <Box
                     sx={{

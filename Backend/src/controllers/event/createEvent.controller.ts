@@ -57,8 +57,8 @@ export default async function createEvent(c: Context) {
             }, 401)
         }
 
-        const certTemplatePath = await saveFile(certTemplate, "templates", result.data.title.replace(/\s+/g, '_') + "_template")
-        const certExcelPath = await saveFile(certExcel, "excels", result.data.title.replace(/\s+/g, '_') + "_excel")
+        const certTemplatePath = await saveFile(certTemplate, "templates", result.data.title.replace(/\s+/g, '_') + "_template" + "_" + Date.now())
+        const certExcelPath = await saveFile(certExcel, "excels", result.data.title.replace(/\s+/g, '_') + "_excel" + "_" + Date.now())
 
         let eventParticipant = 0
 

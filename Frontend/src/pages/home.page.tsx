@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Box,
   Container,
@@ -9,9 +9,9 @@ import {
 } from "@mui/material";
 import { MdAdd, MdSearch } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import StatusBadge from "../components/statusBadge.component";
 
-
-import { getAllEventsAPI } from "../services/apis/event.api";
+import { useGetAllEvents } from "../hooks/query/event.query";
 
 import Navbar from "../components/navbar.component";
 import ButtonComponent from "../components/button.component";
@@ -19,7 +19,8 @@ import EventCard from "../components/eventCard.component";
 
 export default function Homepage() {
   const navigate = useNavigate();
-  const [activities, setActivities] = useState<any>([]);
+  const { data, isLoading, isError } = useGetAllEvents();
+  const activities = data?.data?.data?.events || [];
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredActivities = activities.filter((activity: any) =>
@@ -30,18 +31,17 @@ export default function Homepage() {
     navigate("/event/create");
   };
 
-  const fetchEvents = async () => {
-    try {
-      const res = await getAllEventsAPI();
-      setActivities(res.data.data.events);
-    } catch (error) {
-      console.error("Failed to fetch events:", error);
-    }
-  };
+  if (isLoading) {
+    return (
+      <Box sx={{ width: "100%", height: "100vh", display: "flex", justifyContent: 'center', alignItems: "center" }}>
+        <StatusBadge status="loading" size="small" />
+      </Box>
+    );
+  }
 
-  useEffect(() => {
-    fetchEvents();
-  }, []);
+  if (isError) {
+    return <div>Failed to load events</div>;
+  }
 
   return (
     <Box sx={{ backgroundColor: "#f9fafb", minHeight: "100vh" }}>
