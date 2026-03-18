@@ -6,7 +6,7 @@ export default function BackBTN() {
     const navigate = useNavigate();
     return (
         <Button
-            onClick={() => navigate("/")}
+            onClick={() => navigate(-1)}
             sx={{
                 minWidth: "auto",
                 color: "#64748b",

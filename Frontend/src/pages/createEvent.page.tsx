@@ -18,7 +18,8 @@ import {
 } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 
-import { createEventAPI, getSampleCertificateAPI } from "../services/apis/event.api";
+import { createEventAPI } from "../services/apis/event.api";
+import { getSampleCertificateAPI } from "../services/apis/certificate.api";
 
 import Navbar from "../components/navbar.component";
 import StatusBadge from "../components/statusBadge.component";

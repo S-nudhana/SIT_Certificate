@@ -63,7 +63,8 @@ export default async function getEventCertificateGenerate(c: Context) {
                 throw new Error(`Failed to generate certificate for ${firstname} ${lastname}`)
             }
             const safeEmail = email.replace(/[^a-zA-Z0-9@._-]/g, "")
-            const filename = `${eventID}_${safeEmail}.pdf`
+            const date = new Date().toISOString().split("T")[0]
+            const filename = `${eventID}_${safeEmail}_${date}.pdf`
             const filepath = path.join(tempDir, filename)
             await fs.writeFile(filepath, certificate)
             generatedCertificates.push({

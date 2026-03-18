@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
 
 import axiosInstance from "../services/axios/axiosInstances";
 import { setAuth } from "../store/slices/authSlices";
