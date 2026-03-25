@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 import StatusBadge from "../components/statusBadge.component";
-import PDFViewer from "./PDFViewer.component";
 import type { EventCardProps } from "../types/components.type";
 
 export default function EventCard({
@@ -29,7 +28,7 @@ export default function EventCard({
 
     const blob = new Blob(
       [Uint8Array.from(atob(imageSrc), (c) => c.charCodeAt(0))],
-      { type: "application/pdf" }
+      { type: "image/png" }
     );
 
     const url = URL.createObjectURL(blob);
@@ -64,7 +63,22 @@ export default function EventCard({
     >
       {/* PDF Preview */}
       <Box>
-        {imageUrl && <PDFViewer fileUrl={imageUrl} />}
+        {imageUrl ? (
+          <img src={imageUrl} alt="Event Cover" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+        ) : (
+          <Box
+            sx={{
+              width: "100%",
+              height: "150px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "#e5e7eb",
+            }}
+          >
+            <Typography sx={{ color: "#6b7280" }}>No Preview Available</Typography>
+          </Box>
+        )}
       </Box>
 
       <Divider />

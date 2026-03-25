@@ -1,4 +1,5 @@
 import { Context } from "hono";
+import path from "path"
 
 import { createEventModel } from "../../models/event.model";
 import { createEventSchema } from "../../validators/event.validators";
@@ -6,6 +7,7 @@ import { EventCreatePayload, EventCreateResponse } from "../../types/event.type"
 import { TokenData } from "../../types/jwt.type";
 import { countExcelRows } from "../../utils/countExcelRows";
 import { saveFile } from "../../utils/uploadFile"
+import { convertPdfToPng } from "../../utils/pdfToPng";
 
 export default async function createEvent(c: Context) {
     try {
@@ -60,6 +62,18 @@ export default async function createEvent(c: Context) {
         const certTemplatePath = await saveFile(certTemplate, "templates", result.data.title.replace(/\s+/g, '_') + "_template" + "_" + Date.now())
         const certExcelPath = await saveFile(certExcel, "excels", result.data.title.replace(/\s+/g, '_') + "_excel" + "_" + Date.now())
 
+        let certPngPath: string = ""
+
+        if (certTemplatePath != null) {
+            const pdfPath = path.join(process.cwd(), certTemplatePath)
+            const certPng = await convertPdfToPng(pdfPath)
+            certPngPath = await saveFile(
+                certPng,
+                "certificatePng",
+                result.data.title.replace(/\s+/g, '_') + "_template_" + Date.now()
+            )
+        }
+
         let eventParticipant = 0
 
         if (certExcelPath !== null) {
@@ -79,6 +93,7 @@ export default async function createEvent(c: Context) {
             status: "created",
             certTemplate: certTemplatePath,
             certExcel: certExcelPath,
+            certPng: certPngPath,
             textSize: result.data.textSize,
             textXPos: result.data.textXPos,
             textYPos: result.data.textYPos,

@@ -16,16 +16,16 @@ export default async function getEvents(c: Context) {
         const eventsWithFiles = await Promise.all(
             events.map(async (event) => {
                 try {
-                    const pdfPath = path.join(process.cwd(), event.eventCertificate)
-                    const pdfBytes = await fs.readFile(pdfPath)
+                    const coverPath = path.join(process.cwd(), event.eventCertificateCover)
+                    const pngBytes = await fs.readFile(coverPath)
                     return {
                         ...event,
-                        eventCertificate: pdfBytes.toString("base64"),
+                        eventCertificateCover: pngBytes.toString("base64"),
                     }
                 } catch {
                     return {
                         ...event,
-                        eventCertificate: null
+                        eventCertificateCover: null
                     }
                 }
             })
