@@ -1,7 +1,6 @@
 import { Box, Divider, Paper, Stack, Typography } from "@mui/material";
 import { MdGroup } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
 
 import StatusBadge from "../components/statusBadge.component";
 import type { EventCardProps } from "../types/components.type";
@@ -14,30 +13,11 @@ export default function EventCard({
   imageSrc,
 }: EventCardProps) {
   const navigate = useNavigate();
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-
+  const baseImageUrl = import.meta.env.VITE_IMG_URL;
+  const fullImageUrl = imageSrc ? `${baseImageUrl}${imageSrc}` : null;
   const handleActivityClick = (activityId: string) => {
     navigate(`/event/${activityId}`);
   };
-
-  useEffect(() => {
-    if (!imageSrc) {
-      setImageUrl(null);
-      return;
-    }
-
-    const blob = new Blob(
-      [Uint8Array.from(atob(imageSrc), (c) => c.charCodeAt(0))],
-      { type: "image/png" }
-    );
-
-    const url = URL.createObjectURL(blob);
-    setImageUrl(url);
-
-    return () => {
-      URL.revokeObjectURL(url);
-    };
-  }, [imageSrc]);
 
   const getStatusBadge = (status: string) => {
     return <StatusBadge status={status} size="small" />;
@@ -63,8 +43,8 @@ export default function EventCard({
     >
       {/* PDF Preview */}
       <Box>
-        {imageUrl ? (
-          <img src={imageUrl} alt="Event Cover" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+        {fullImageUrl ? (
+          <img src={fullImageUrl} alt="Event Cover" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
         ) : (
           <Box
             sx={{
