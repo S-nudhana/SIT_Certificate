@@ -36,7 +36,7 @@ export interface EventGetCertificateTemplateResponse {
 export interface EventGetAllResponse {
     eventID: number
     eventTitle: string
-    eventCertificate: string
+    eventCertificateCover: string
     eventStatus: string
     eventParticipant: number
     eventCreateAt: Date
@@ -63,6 +63,7 @@ export interface EventCreatePayload {
     status: string
     certTemplate: string
     certExcel: string
+    certPng: string
     textSize: number
     textXPos: number
     textYPos: number
@@ -81,6 +82,7 @@ export interface EventUpdatePayload {
     status: string
     certTemplate: string
     certExcel: string
+    certPng: string
     textSize: number
     textXPos: number
     textYPos: number

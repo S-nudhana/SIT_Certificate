@@ -1,10 +1,8 @@
 import { Box, Divider, Paper, Stack, Typography } from "@mui/material";
 import { MdGroup } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
 
 import StatusBadge from "../components/statusBadge.component";
-import PDFViewer from "./PDFViewer.component";
 import type { EventCardProps } from "../types/components.type";
 
 export default function EventCard({
@@ -15,30 +13,11 @@ export default function EventCard({
   imageSrc,
 }: EventCardProps) {
   const navigate = useNavigate();
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-
+  const baseImageUrl = import.meta.env.VITE_IMG_URL;
+  const fullImageUrl = imageSrc ? `${baseImageUrl}${imageSrc}` : null;
   const handleActivityClick = (activityId: string) => {
     navigate(`/event/${activityId}`);
   };
-
-  useEffect(() => {
-    if (!imageSrc) {
-      setImageUrl(null);
-      return;
-    }
-
-    const blob = new Blob(
-      [Uint8Array.from(atob(imageSrc), (c) => c.charCodeAt(0))],
-      { type: "application/pdf" }
-    );
-
-    const url = URL.createObjectURL(blob);
-    setImageUrl(url);
-
-    return () => {
-      URL.revokeObjectURL(url);
-    };
-  }, [imageSrc]);
 
   const getStatusBadge = (status: string) => {
     return <StatusBadge status={status} size="small" />;
@@ -64,7 +43,22 @@ export default function EventCard({
     >
       {/* PDF Preview */}
       <Box>
-        {imageUrl && <PDFViewer fileUrl={imageUrl} />}
+        {fullImageUrl ? (
+          <img src={fullImageUrl} alt="Event Cover" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+        ) : (
+          <Box
+            sx={{
+              width: "100%",
+              height: "150px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "#e5e7eb",
+            }}
+          >
+            <Typography sx={{ color: "#6b7280" }}>No Preview Available</Typography>
+          </Box>
+        )}
       </Box>
 
       <Divider />

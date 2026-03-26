@@ -160,29 +160,45 @@ export default function Homepage() {
         </Stack>
 
         {/* Activity Cards Grid */}
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: {
-              xs: "1fr",
-              sm: "repeat(2, 1fr)",
-              md: "repeat(4, 1fr)",
-            },
-            gap: 2.5,
-          }}
-        >
-          {filteredActivities.map((activity: any) => (
-            <EventCard
-              key={activity.eventID}
-              id={activity.eventID}
-              imageSrc={activity.eventCertificate}
-              title={activity.eventTitle}
-              participants={activity.eventParticipant}
-              status={activity.eventStatus}
-            />
-          ))}
-        </Box>
-      </Container>
-    </Box>
+
+        {filteredActivities.length === 0 ? (
+          <Box sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            width: "100%",
+            height: "200px",
+            color: "#6b7280",
+          }}>
+            <Typography>
+              ไม่พบกิจกรรม {searchQuery == "" ? "" : `ที่ตรงกับ "${searchQuery}"`}
+            </Typography>
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "1fr",
+                sm: "repeat(2, 1fr)",
+                md: "repeat(4, 1fr)",
+              },
+              gap: 2.5,
+            }}
+          >
+            {filteredActivities.map((activity: any) => (
+              <EventCard
+                key={activity.eventID}
+                id={activity.eventID}
+                imageSrc={activity.eventCertificateCover}
+                title={activity.eventTitle}
+                participants={activity.eventParticipant}
+                status={activity.eventStatus}
+              />
+            ))}
+          </Box>
+        )}
+      </Container >
+    </Box >
   );
 }

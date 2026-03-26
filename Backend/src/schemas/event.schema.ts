@@ -1,21 +1,23 @@
 import { z } from 'zod'
 
 export const eventGetAllResponseSchema = z.object({
-  eventID: z.number(),
-  eventTitle: z.string(),
-  eventStatus: z.string(),
-  eventParticipant: z.number(),
-  eventCreateAt: z.date(),
-  eventUpdateAt: z.date()
+    eventID: z.number(),
+    eventTitle: z.string(),
+    eventStatus: z.string(),
+    eventParticipant: z.number(),
+    eventCreateAt: z.date(),
+    eventUpdateAt: z.date()
 })
 
 export const eventGetByIDResponseSchema = z.object({
-  eventID: z.number(),
-  eventTitle: z.string(),
-  certificateURL: z.string(),
-  eventStatus: z.string(),
-  eventStartDate: z.date(),
-  eventEndDate: z.date()
+    eventID: z.number(),
+    eventTitle: z.string(),
+    certificateURL: z.string(),
+    excelURL: z.string(),
+    eventStatus: z.string(),
+    eventParticipant: z.number(),
+    eventCreateAt: z.date(),
+    eventUpdateAt: z.date()
 })
 
 export const eventCreateResponseSchema = z.object({
