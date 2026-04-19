@@ -3,7 +3,7 @@ import { Context } from "hono"
 import { getCertificateSampleGenerateSchema } from "../../validators/certificate.validators"
 import { fetchAndFillCertificate } from "../../utils/certificate"
 
-export default async function getEventCertificateSampleGenerate(c: Context) {
+export default async function getCertificateSampleGenerate(c: Context) {
     try {
         const body = await c.req.parseBody()
         const textXPos = Number(body.textXPos)

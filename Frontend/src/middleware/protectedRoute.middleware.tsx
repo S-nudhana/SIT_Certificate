@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 
-import axiosInstance from "../services/axios/axiosInstances";
 import { setAuth } from "../store/slices/authSlices";
 import { Box } from "@mui/material";
 
 import type { Props } from "../types/middleware.type";
 import { useAppDispatch } from "../hooks/redux";
+import { authorizeAPI } from "../services/apis/user.api";
 
 export default function ProtectedRoute({ children }: Props) {
 
@@ -17,7 +17,7 @@ export default function ProtectedRoute({ children }: Props) {
     useEffect(() => {
         const checkAuth = async () => {
             try {
-                const res = await axiosInstance.get("/user/authorize")
+                const res = await authorizeAPI()
                 setAuthorized(res.data.data.authorized)
                 dispatch(
                     setAuth({

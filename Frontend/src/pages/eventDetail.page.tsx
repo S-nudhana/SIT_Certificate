@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef } from "react"
 import {
   Box,
   Button,
@@ -7,7 +7,7 @@ import {
   Typography,
   Paper,
   Container,
-} from "@mui/material";
+} from "@mui/material"
 import {
   MdEdit,
   MdDescription,
@@ -16,80 +16,89 @@ import {
   MdSettings,
   MdDelete,
   MdUploadFile,
-} from "react-icons/md";
-import { useNavigate, useParams } from "react-router-dom";
-import { mockActivities } from "../data/mockData";
-import type { Activity } from "../data/mockData";
+} from "react-icons/md"
+import { useNavigate, useParams } from "react-router-dom"
+import { mockActivities } from "../data/mockData"
+import type { Activity } from "../data/mockData"
 
-import Navbar from "../components/navbar.component";
-import StatusBadge from "../components/statusBadge.component";
-import BackBTN from "../components/backBTN.component";
-import PdfViewer from "../components/PDFViewer.component";
-import ButtonComponent from "../components/button.component";
-import XLSXViewer from "../components/XLSXViewer.component";
+import Navbar from "../components/navbar.component"
+import StatusBadge from "../components/statusBadge.component"
+import BackBTN from "../components/backBTN.component"
+import PdfViewer from "../components/PDFViewer.component"
+import ButtonComponent from "../components/button.component"
+import XLSXViewer from "../components/XLSXViewer.component"
 
-import type { FieldConfig } from "../types/event/eventDetail.type";
+import type { FieldConfig } from "../types/event/eventDetail.type"
 
 export default function EventDetailPage() {
-  const navigate = useNavigate();
-  const { id } = useParams();
+  const navigate = useNavigate()
+  const { id } = useParams()
 
   const [activity] = useState<Activity | null>(
     mockActivities.find((a) => a.id === id) || null
-  );
+  )
 
-  const [activityName, setActivityName] = useState(activity?.title || "");
-  const [isEditingName, setIsEditingName] = useState(false);
+  const [activityName, setActivityName] = useState(activity?.title || "")
+  const [isEditingName, setIsEditingName] = useState(false)
 
-  const [pdfFile, setPdfFile] = useState<File | undefined>();
-  const [pdfUrl, setPdfUrl] = useState<string | null>();
-  const [excelFile, setExcelFile] = useState<File | undefined>();
-  const [excelUrl, setExcelUrl] = useState<string | null>();
+  const [pdfFile, setPdfFile] = useState<File | undefined>()
+  const [pdfUrl, setPdfUrl] = useState<string | null>()
+  const [excelFile, setExcelFile] = useState<File | undefined>()
+  const [excelUrl, setExcelUrl] = useState<string | null>()
 
   const [fieldConfig, setFieldConfig] = useState<FieldConfig>({
     fontSize: 24,
     top: 50,
     left: 50,
-  });
+  })
 
-  const pdfInputRef = useRef<HTMLInputElement>(null);
-  const excelInputRef = useRef<HTMLInputElement>(null);
+  const pdfInputRef = useRef<HTMLInputElement>(null)
+  const excelInputRef = useRef<HTMLInputElement>(null)
 
   const handleDrop =
     (type: "pdf" | "excel") => (e: React.DragEvent<HTMLDivElement>) => {
-      e.preventDefault();
-      const file = e.dataTransfer.files[0];
-      if (!file) return;
-      if (type === "pdf") setPdfFile(file);
-      else setExcelFile(file);
-    };
+      e.preventDefault()
+      const file = e.dataTransfer.files[0]
+      if (!file) return
+      if (type === "pdf") setPdfFile(file)
+      else setExcelFile(file)
+    }
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) =>
-    e.preventDefault();
+    e.preventDefault()
 
   const handleDelete = () => {
     if (confirm("คุณแน่ใจหรือว่าต้องการลบกิจกรรมนี้?")) {
-      navigate("/");
+      navigate("/")
     }
-  };
+  }
 
   const handleConfirm = () => {
-    console.log({ fieldConfig });
-  };
+    console.log({ fieldConfig })
+  }
 
   const handleGenerateCertificates = () => {
-    console.log("Generating certificates...");
-  };
+    console.log("Generating certificates...")
+  }
 
   if (!activity) {
     return (
       <Box sx={{ backgroundColor: "#f9fafb", minHeight: "100vh" }}>
         <Navbar />
-        <Container maxWidth="lg" sx={{ py: 6 }}>
-          <Typography variant="h5">ไม่พบกิจกรรม</Typography>
+        <Container maxWidth="lg" sx={{
+          height: "70vh",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+        }}>
+          <Box sx={{textAlign: "center", gap: "20px", display: "flex", flexDirection: "column", alignItems: "center"}}>
+            <Typography sx={{ fontSize: "20px", color: "#1e293b" }}>ไม่พบกิจกรรม</Typography>
+            <ButtonComponent onclick={() => navigate("/")} text="กลับไปที่หน้าหลัก" width="100%" />
+          </Box>
         </Container>
       </Box>
-    );
+    )
   }
 
   return (
@@ -113,12 +122,12 @@ export default function EventDetailPage() {
                         autoFocus
                         sx={{
                           "& .MuiInputBase-root": {
-                            fontSize: "1.5rem",
+                            fontSize: "1rem",
                             fontWeight: 700,
                             color: "#1e293b",
                           },
                           "& .MuiInputBase-input": {
-                            padding: "2px 10px",
+                            padding: "10px",
                           },
                         }}
                       />
@@ -220,11 +229,11 @@ export default function EventDetailPage() {
                         type="file"
                         accept=".pdf"
                         onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (!file) return;
+                          const file = e.target.files?.[0]
+                          if (!file) return
 
-                          setPdfFile(file);
-                          setPdfUrl(URL.createObjectURL(file));
+                          setPdfFile(file)
+                          setPdfUrl(URL.createObjectURL(file))
                         }}
                         style={{ display: "none" }}
                       />
@@ -259,11 +268,11 @@ export default function EventDetailPage() {
                         type="file"
                         accept=".pdf"
                         onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (!file) return;
+                          const file = e.target.files?.[0]
+                          if (!file) return
 
-                          setPdfFile(file);
-                          setPdfUrl(URL.createObjectURL(file));
+                          setPdfFile(file)
+                          setPdfUrl(URL.createObjectURL(file))
                         }}
                         style={{ display: "none" }}
                       />
@@ -337,11 +346,11 @@ export default function EventDetailPage() {
                         type="file"
                         accept=".xlsx,.xls"
                         onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (!file) return;
+                          const file = e.target.files?.[0]
+                          if (!file) return
 
-                          setExcelFile(file);
-                          setExcelUrl(URL.createObjectURL(file));
+                          setExcelFile(file)
+                          setExcelUrl(URL.createObjectURL(file))
                         }}
                         style={{ display: "none" }}
                       />
@@ -374,11 +383,11 @@ export default function EventDetailPage() {
                         type="file"
                         accept=".xlsx,.xls"
                         onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (!file) return;
+                          const file = e.target.files?.[0]
+                          if (!file) return
 
-                          setExcelFile(file);
-                          setExcelUrl(URL.createObjectURL(file));
+                          setExcelFile(file)
+                          setExcelUrl(URL.createObjectURL(file))
                         }}
                         style={{ display: "none" }}
                       />
@@ -555,5 +564,5 @@ export default function EventDetailPage() {
         </Stack >
       </Container >
     </Box >
-  );
+  )
 }

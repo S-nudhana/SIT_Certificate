@@ -1,6 +1,6 @@
 import AxiosInstance from "../axios/axiosInstances"
 
-import type { GetSampleCertificatePayload } from "../../types/event/certificateAPI.type"
+import type { GetSampleCertificatePayload } from "../../types/certificate/certificateAPI.type"
 
 export async function getSampleCertificateAPI(payload: GetSampleCertificatePayload) {
     const formData = new FormData()

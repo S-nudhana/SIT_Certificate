@@ -23,11 +23,12 @@ import {
 
 const event = new OpenAPIHono()
 
-event.use('/', authMiddleware(['ADMIN', 'PROFESSOR']))
+const protectedEventMiddleware = authMiddleware(['ADMIN', 'PROFESSOR'])
 const getEventsRoute = createRoute({
     method: 'get',
     path: '/',
     tags: ['Event'],
+    middleware: [protectedEventMiddleware],
     responses: {
         200: {
             description: 'Events fetched',
@@ -57,11 +58,11 @@ const getEventsRoute = createRoute({
 })
 event.openapi(getEventsRoute, getEvents)
 
-event.use('/:id', authMiddleware(['ADMIN', 'PROFESSOR']))
 const getEventRoute = createRoute({
     method: 'get',
     path: '/{id}',
     tags: ['Event'],
+    middleware: [protectedEventMiddleware],
     request: {
         params: z.object({
             id: z.string()
@@ -120,11 +121,11 @@ const getEventRoute = createRoute({
 })
 event.openapi(getEventRoute, getEvent)
 
-event.use('/', authMiddleware(['ADMIN', 'PROFESSOR']))
 const createEventRoute = createRoute({
     method: 'post',
     path: '/',
     tags: ['Event'],
+    middleware: [protectedEventMiddleware],
     request: {
         body: {
             content: {
@@ -182,11 +183,11 @@ const createEventRoute = createRoute({
 })
 event.openapi(createEventRoute, createEvent)
 
-event.use('/:id', authMiddleware(['ADMIN', 'PROFESSOR']))
 const updateEventRoute = createRoute({
     method: 'put',
     path: '/{id}',
     tags: ['Event'],
+    middleware: [protectedEventMiddleware],
     request: {
         params: z.object({
             id: z.string()
@@ -253,6 +254,7 @@ const deleteEventRoute = createRoute({
     method: 'delete',
     path: '/{id}',
     tags: ['Event'],
+    middleware: [protectedEventMiddleware],
     request: {
         params: z.object({
             id: z.string()
