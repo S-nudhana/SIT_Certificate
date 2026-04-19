@@ -28,21 +28,25 @@ import PdfViewer from "../components/PDFViewer.component";
 import ButtonComponent from "../components/button.component";
 import XLSXViewer from "../components/XLSXViewer.component";
 
-export default function EventDetailPage() {
+export default function CreateEventPage() {
   const navigate = useNavigate();
   const now = new Date();
 
-  const [activityName, setActivityName] = useState("ชื่อกิจกรรม");
-  const [isEditingName, setIsEditingName] = useState(false);
+  const [activityName, setActivityName] = useState<string>("ชื่อกิจกรรม");
+  const [isEditingName, setIsEditingName] = useState<boolean>(false);
 
   const [pdfFile, setPdfFile] = useState<File | undefined>();
-  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [pdfUrl, setPdfUrl] = useState<string | null>();
   const [excelFile, setExcelFile] = useState<File | undefined>();
   const [excelUrl, setExcelUrl] = useState<string | null>();
 
   const [sampleCertificateUrl, setSampleCertificateUrl] = useState<string | null>();
 
-  const [fieldConfig, setFieldConfig] = useState({
+  const [fieldConfig, setFieldConfig] = useState<{
+    fontSize: string;
+    top: string;
+    left: string;
+  }>({
     fontSize: "24",
     top: "50",
     left: "50",
@@ -151,12 +155,12 @@ export default function EventDetailPage() {
                         autoFocus
                         sx={{
                           "& .MuiInputBase-root": {
-                            fontSize: "1.5rem",
+                            fontSize: "1rem",
                             fontWeight: 700,
                             color: "#1e293b",
                           },
                           "& .MuiInputBase-input": {
-                            padding: "2px 10px",
+                            padding: "10px",
                           },
                         }}
                       />
@@ -191,11 +195,13 @@ export default function EventDetailPage() {
 
             <Button
               onClick={handleDelete}
+              variant="outlined"
               sx={{
                 minWidth: "auto",
                 color: "#ef4444",
+                borderColor: "#fecaca",
                 padding: "8px",
-                "&:hover": { backgroundColor: "#fee2e2" },
+                "&:hover": { backgroundColor: "#fee2e2", borderColor: "#ef4444" },
               }}
             >
               <MdDelete size={20} />
@@ -263,7 +269,6 @@ export default function EventDetailPage() {
                           onChange={async (e) => {
                             const file = e.target.files?.[0];
                             if (!file) return;
-
                             setPdfFile(file);
                             setPdfUrl(URL.createObjectURL(file));
                             handleSampleCertificate(file);
@@ -344,7 +349,7 @@ export default function EventDetailPage() {
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1, pb: "10px" }}>
                   <MdGroup size={20} style={{ color: "#0C86FE" }} />
                   <Typography sx={{ fontSize: "16px", fontWeight: 600, color: "#1e293b" }}>
-                    รายชื่อผู้เข้าร่วม
+                    รายชื่อผู้เข้าร่วม <span style={{ color: "red" }}>*</span>
                   </Typography>
                 </Box>
                 <Box sx={{ height: { xs: "300px", md: "435px" }, width: { xs: "calc(100vw - 63px)", md: "100%" }, }}>
@@ -463,7 +468,7 @@ export default function EventDetailPage() {
                 boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
               }}
             >
-              <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "2fr 1fr" }, gap: 9 }}>
+              <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "2fr 1fr" }, gap: 3 }}>
                 {/* Preview */}
                 {sampleCertificateUrl ? (
                   <Box sx={{ width: "100%", maxWidth: 700 }}>

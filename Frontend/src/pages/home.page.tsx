@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from "react"
 import {
   Box,
   Container,
@@ -6,41 +6,41 @@ import {
   Typography,
   Stack,
   InputAdornment,
-} from "@mui/material";
-import { MdAdd, MdSearch } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
-import StatusBadge from "../components/statusBadge.component";
+} from "@mui/material"
+import { MdAdd, MdSearch } from "react-icons/md"
+import { useNavigate } from "react-router-dom"
+import StatusBadge from "../components/statusBadge.component"
 
-import { useGetAllEvents } from "../hooks/query/event.query";
+import { useGetAllEvents } from "../hooks/query/event.query"
 
-import Navbar from "../components/navbar.component";
-import ButtonComponent from "../components/button.component";
-import EventCard from "../components/eventCard.component";
+import Navbar from "../components/navbar.component"
+import ButtonComponent from "../components/button.component"
+import EventCard from "../components/eventCard.component"
 
 export default function Homepage() {
-  const navigate = useNavigate();
-  const { data, isLoading, isError } = useGetAllEvents();
-  const activities = data?.data?.data?.events || [];
-  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate()
+  const { data, isLoading, isError } = useGetAllEvents()
+  const activities = data?.data?.data?.events || []
+  const [searchQuery, setSearchQuery] = useState("")
 
   const filteredActivities = activities.filter((activity: any) =>
     activity.eventTitle.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  )
 
   const handleCreateActivity = () => {
-    navigate("/event/create");
-  };
+    navigate("/event/create")
+  }
 
   if (isLoading) {
     return (
       <Box sx={{ width: "100%", height: "100vh", display: "flex", justifyContent: 'center', alignItems: "center" }}>
         <StatusBadge status="loading" size="small" />
       </Box>
-    );
+    )
   }
 
   if (isError) {
-    return <div>Failed to load events</div>;
+    return <div>Failed to load events</div>
   }
 
   return (
@@ -200,5 +200,5 @@ export default function Homepage() {
         )}
       </Container >
     </Box >
-  );
+  )
 }

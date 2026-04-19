@@ -11,7 +11,7 @@ import { useAppDispatch } from "../hooks/redux";
 import { Slide, useScrollTrigger } from "@mui/material";
 import type { HideOnScrollProps } from "../types/components.type";
 
-import { Logout } from "../services/apis/user.api";
+import { logoutAPI } from "../services/apis/user.api";
 
 function HideOnScroll(props: HideOnScrollProps) {
   const { children, window } = props;
@@ -33,7 +33,7 @@ export default function Navbar(props: HideOnScrollProps) {
 
   const handleLogout = async () => {
     try {
-      const res = await Logout();
+      const res = await logoutAPI();
       if (res?.status === 200) {
         dispatch(logout());
         navigate("/login");

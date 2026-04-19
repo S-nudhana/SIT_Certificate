@@ -1,4 +1,5 @@
 import { OpenAPIHono } from '@hono/zod-openapi'
+import { Hono, Context } from 'hono'
 import { swaggerUI } from '@hono/swagger-ui'
 import { logger } from 'hono/logger'
 import { secureHeaders } from 'hono/secure-headers'
@@ -12,7 +13,20 @@ import user from './routes/user.route'
 import event from './routes/event.route'
 import certificate from './routes/certificate.route'
 
-const app = new OpenAPIHono()
+const openapi = new OpenAPIHono()
+const app = new Hono()
+
+openapi.route('/user', user)
+openapi.route('/event', event)
+openapi.route('/certificate', certificate)
+
+if (Bun.env.NODE_ENV !== 'production') {
+  openapi.doc('/doc', {
+    openapi: '3.0.0',
+    info: { title: 'Certificate API', version: '1.0.0' }
+  })
+  app.get('/swagger', swaggerUI({ url: '/api/doc' }))
+}
 
 app.use('*', secureHeaders({
   crossOriginResourcePolicy: 'cross-origin',
@@ -32,30 +46,13 @@ app.use('*', corsConfig)
 app.use('*', rateLimiterConfig)
 app.use('*', logger())
 
-app.get('/api/health', (c) => {
-  return c.json({
-    status: 'ok',
-    message: 'API is running'
-  })
-})
+app.get('/api/health', (c: Context) => c.json({ status: 'ok', message: 'API is running' }))
+app.use('/uploads/*', serveStatic({
+  root: './uploads',
+  rewriteRequestPath: (path) => path.replace(/^\/uploads/, '')
+}))
 
-app.use('/uploads/*', serveStatic({ root: './' }))
-
-app.route('/api/user', user)
-app.route('/api/event', event)
-app.route('/api/certificate', certificate)
-
-if (Bun.env.NODE_ENV !== 'production') {
-  app.doc('/api/doc', {
-    openapi: '3.0.0',
-    info: {
-      title: 'Certificate API',
-      version: '1.0.0'
-    }
-  })
-
-  app.get('/api/swagger', swaggerUI({ url: '/api/doc' }))
-}
+app.route('/api', openapi)
 
 export default {
   port: Bun.env.PORT || 3001,

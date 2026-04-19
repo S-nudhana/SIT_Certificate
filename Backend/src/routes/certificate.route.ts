@@ -8,7 +8,7 @@ import getEventCertificateDownload from '../controllers/certificate/getCertifica
 import getEventCertificateSampleGenerate from '../controllers/certificate/getCertificateSampleGenerate.controller'
 
 const certificate = new OpenAPIHono()
-certificate.use('/{id}/certificate/*', authMiddleware(['admin', 'professor']))
+const protectedCertificateMiddleware = authMiddleware(['ADMIN', 'PROFESSOR'])
 const generateCertificateRoute = createRoute({
     method: 'get',
     path: '/{id}/generate',
@@ -33,6 +33,7 @@ const downloadCertificateRoute = createRoute({
     method: 'get',
     path: '/{id}/download',
     tags: ['Certificate'],
+    middleware: [protectedCertificateMiddleware],
     request: {
         params: z.object({
             id: z.string()

@@ -32,7 +32,7 @@ export default async function login(c: Context) {
     await setSignedCookie(c, "session", token, COOKIE_SECRET, {
       httpOnly: true,
       secure: Bun.env.NODE_ENV === "production",
-      sameSite: "Lax",
+      sameSite: "Strict",
       path: "/",
       maxAge: 60 * 60 * 24
     })
