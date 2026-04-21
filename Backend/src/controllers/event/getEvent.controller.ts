@@ -7,7 +7,7 @@ import { EventGetByIDResponse } from "../../types/event.type";
 export default async function getEvent(c: Context) {
     try {
         const id = c.req.param('id')
-        const result = getEventByIdSchema.safeParse(id)
+        const result = getEventByIdSchema.safeParse({ eventID: Number(id) })
         if (!result.success) {
             return c.json({
                 data: { event: null },

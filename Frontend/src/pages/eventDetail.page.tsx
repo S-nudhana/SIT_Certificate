@@ -1,4 +1,4 @@
-import { useState, useRef } from "react"
+import { useState, useRef, useMemo, useEffect } from "react"
 import {
   Box,
   Button,
@@ -18,8 +18,8 @@ import {
   MdUploadFile,
 } from "react-icons/md"
 import { useNavigate, useParams } from "react-router-dom"
-import { mockActivities } from "../data/mockData"
-import type { Activity } from "../data/mockData"
+// import { mockActivities } from "../data/mockData"
+// import type { Activity } from "../data/mockData"
 
 import Navbar from "../components/navbar.component"
 import StatusBadge from "../components/statusBadge.component"
@@ -27,24 +27,61 @@ import BackBTN from "../components/backBTN.component"
 import PdfViewer from "../components/PDFViewer.component"
 import ButtonComponent from "../components/button.component"
 import XLSXViewer from "../components/XLSXViewer.component"
+import { useGetEventById } from "../hooks/query/event.query"
 
 import type { FieldConfig } from "../types/event/eventDetail.type"
 
 export default function EventDetailPage() {
   const navigate = useNavigate()
   const { id } = useParams()
+  const { data, isLoading, isError } = useGetEventById(Number(id))
+  console.log("Event Detail Data:", id)
+  const event = data?.data?.data?.event
 
-  const [activity] = useState<Activity | null>(
-    mockActivities.find((a) => a.id === id) || null
-  )
+  const resolveFileUrl = (url?: string) => {
+    if (!url) return null
+    if (url.startsWith("http://") || url.startsWith("https://")) return url
+    const baseUrl = import.meta.env.VITE_IMG_URL || ""
+    return `${baseUrl}${url}`
+  }
+
+  const activity = useMemo(() => {
+    if (!event) return null
+
+    return {
+      id: event.eventID,
+      title: event.eventTitle,
+      certificateURL: event.certificateURL,
+      excelURL: event.excelURL,
+      participant: event.eventParticipant,
+      status: event.eventStatus,
+      createdAt: event.eventCreateAt || "-",
+      updatedAt: event.eventUpdateAt || "-",
+    }
+  }, [event])
+
 
   const [activityName, setActivityName] = useState(activity?.title || "")
   const [isEditingName, setIsEditingName] = useState(false)
 
+  useEffect(() => {
+    setActivityName(activity?.title || "")
+  }, [activity])
+
   const [pdfFile, setPdfFile] = useState<File | undefined>()
-  const [pdfUrl, setPdfUrl] = useState<string | null>()
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null)
   const [excelFile, setExcelFile] = useState<File | undefined>()
-  const [excelUrl, setExcelUrl] = useState<string | null>()
+  const [excelUrl, setExcelUrl] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!pdfFile) {
+      setPdfUrl(resolveFileUrl(activity?.certificateURL))
+    }
+    if (!excelFile) {
+      setExcelUrl(resolveFileUrl(activity?.excelURL))
+    }
+  }, [activity, pdfFile, excelFile])
+
 
   const [fieldConfig, setFieldConfig] = useState<FieldConfig>({
     fontSize: 24,
@@ -81,6 +118,18 @@ export default function EventDetailPage() {
     console.log("Generating certificates...")
   }
 
+  if (isLoading) {
+    return (
+      <Box sx={{ width: "100%", height: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <StatusBadge status="loading" size="small" />
+      </Box>
+    )
+  }
+
+  if (isError) {
+    return <div>Failed to load event detail</div>
+  }
+
   if (!activity) {
     return (
       <Box sx={{ backgroundColor: "#f9fafb", minHeight: "100vh" }}>
@@ -92,7 +141,7 @@ export default function EventDetailPage() {
           alignItems: "center",
           justifyContent: "center",
         }}>
-          <Box sx={{textAlign: "center", gap: "20px", display: "flex", flexDirection: "column", alignItems: "center"}}>
+          <Box sx={{ textAlign: "center", gap: "20px", display: "flex", flexDirection: "column", alignItems: "center" }}>
             <Typography sx={{ fontSize: "20px", color: "#1e293b" }}>ไม่พบกิจกรรม</Typography>
             <ButtonComponent onclick={() => navigate("/")} text="กลับไปที่หน้าหลัก" width="100%" />
           </Box>
@@ -220,7 +269,7 @@ export default function EventDetailPage() {
 
                 {/* Content */}
                 <Box sx={{ minHeight: "300px", height: "100%" }}>
-                  {pdfFile ? (
+                  {pdfUrl ? (
                     <Box sx={{ width: "100%", gap: 2 }}>
                       <PdfViewer key={pdfUrl} fileUrl={pdfUrl || ""} />
                       <ButtonComponent startIcon={<MdUploadFile />} text="อัปโหลดไฟล์ใบประกาศนียบัตรใหม่" width="100%" onclick={() => pdfInputRef.current?.click()} />

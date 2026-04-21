@@ -184,6 +184,7 @@ export default function Homepage() {
                 md: "repeat(4, 1fr)",
               },
               gap: 2.5,
+              cursor: "pointer" 
             }}
           >
             {filteredActivities.map((activity: any) => (
