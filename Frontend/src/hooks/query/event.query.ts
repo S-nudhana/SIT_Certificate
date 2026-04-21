@@ -8,10 +8,10 @@ export function useGetAllEvents() {
     })
 }
 
-export function useGetEventById(id?: string) {
+export function useGetEventById(id: number) {
   return useQuery({
     queryKey: ["event", id],
-    queryFn: () => getEventByIdAPI(id as string),
+    queryFn: () => getEventByIdAPI(id),
     enabled: !!id,
   })
 }
