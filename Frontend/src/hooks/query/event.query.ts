@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { getAllEventsAPI, createEventAPI } from "../../services/apis/event.api"
+import { getAllEventsAPI, getEventByIdAPI, createEventAPI } from "../../services/apis/event.api"
 
 export function useGetAllEvents() {
     return useQuery({
@@ -15,5 +15,12 @@ export function useCreateEvent() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["events"] })
         }
+    })
+}
+
+export function useGetEventById(eventID: number) {
+    return useQuery({
+        queryKey: ["events", eventID],
+        queryFn: () => getEventByIdAPI(eventID),
     })
 }
