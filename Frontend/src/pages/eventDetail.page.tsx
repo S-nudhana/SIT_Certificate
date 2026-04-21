@@ -34,59 +34,49 @@ export default function EventDetailPage() {
   const navigate = useNavigate()
   const { id } = useParams()
   const { data, isLoading, isError } = useGetEventById(Number(id))
-  const event = data?.data?.data?.event
+  const activity = data?.data?.data?.event || []
   const resolveFileUrl = (url?: string) => {
     const baseUrl = import.meta.env.VITE_IMG_URL || ""
     return url ? `${baseUrl}${url}` : null
   }
-
-  const activity = useMemo(() => {
-    if (!event) return null
-    return {
-      id: event.eventID,
-      title: event.eventTitle,
-      certificateURL: event.certificateURL,
-      excelURL: event.excelURL,
-      participant: event.eventParticipant,
-      status: event.eventStatus,
-      createdAt: event.eventCreateAt || "-",
-      updatedAt: event.eventUpdateAt || "-",
-      textSize: event.eventTextSize,
-      textXPosition: event.eventTextXPos,
-      textYPosition: event.eventTextYPos,
-    } 
-  }, [event])
-
+  console.log(activity)
   const [activityName, setActivityName] = useState(activity?.title || "")
   const [isEditingName, setIsEditingName] = useState(false)
+  const [fieldConfig, setFieldConfig] = useState<FieldConfig>({
+    fontSize: 24,
+    top: 50,
+    left: 50,
+  })
 
   useEffect(() => {
     setActivityName(activity?.title || "")
+    setFieldConfig({
+      fontSize: activity.eventTextSize ?? 24,
+      top: activity.eventTextYPos ?? 50,
+      left: activity.eventTextXPos ?? 50,
+    })
   }, [activity])
 
-  // PDF state
   const [pdfFile, setPdfFile] = useState<File | undefined>()
   const [pdfFileFromUrl, setPdfFileFromUrl] = useState<File | undefined>()
   const [pdfUrl, setPdfUrl] = useState<string | null>(null)
 
-  // Excel state
   const [excelFile, setExcelFile] = useState<File | undefined>()
   const [excelUrl, setExcelUrl] = useState<string | null>(null)
   const [excelFileFromUrl, setExcelFileFromUrl] = useState<File | undefined>()
 
-  // Sample certificate state
   const [sampleCertificateUrl, setSampleCertificateUrl] = useState<string | null>(null)
-
-  const [fieldConfig, setFieldConfig] = useState<FieldConfig>({
-    fontSize: activity?.textSize || 24,
-    top: activity?.textYPosition || 50,
-    left: activity?.textXPosition || 50,
-  })
 
   const pdfInputRef = useRef<HTMLInputElement>(null)
   const excelInputRef = useRef<HTMLInputElement>(null)
 
-  // Sync URLs from server + fetch PDF file for sample generation
+  useEffect(() => {
+    const file = pdfFile ?? pdfFileFromUrl
+    if (!file) return
+
+    handleSampleCertificate(file)
+  }, [fieldConfig, pdfFile, pdfFileFromUrl])
+
   useEffect(() => {
     if (!pdfFile) {
       const url = resolveFileUrl(activity?.certificateURL)
@@ -97,17 +87,16 @@ export default function EventDetailPage() {
           .then((blob) => {
             const file = new File([blob], "template.pdf", { type: "application/pdf" })
             setPdfFileFromUrl(file)
-            handleSampleCertificate(file)
           })
           .catch(console.error)
       }
     }
+
     if (!excelFile) {
       setExcelUrl(resolveFileUrl(activity?.excelURL))
     }
   }, [activity])
 
-  // Fetch excel file from server URL for XLSXViewer
   useEffect(() => {
     if (excelUrl && !excelFile && !excelUrl.startsWith("blob:")) {
       fetch(excelUrl)
@@ -120,7 +109,6 @@ export default function EventDetailPage() {
     }
   }, [excelUrl])
 
-  // Cleanup object URLs
   useEffect(() => {
     return () => {
       if (sampleCertificateUrl) URL.revokeObjectURL(sampleCertificateUrl)
@@ -240,7 +228,7 @@ export default function EventDetailPage() {
                         sx={{ fontSize: "24px", fontWeight: 700, color: "#1e293b", cursor: "pointer" }}
                         onClick={() => setIsEditingName(true)}
                       >
-                        {activityName}
+                        {activity.eventTitle}
                       </Typography>
                     )}
                     <Button
@@ -254,7 +242,7 @@ export default function EventDetailPage() {
                   <StatusBadge status={activity.status} size="large" />
                 </Box>
                 <Typography variant="caption" sx={{ color: "#94a3b8", fontSize: "0.75rem" }}>
-                  สร้าง {activity.createdAt} • แก้ไขล่าสุด {activity.updatedAt}
+                  สร้าง {new Date(activity.eventCreateAt).toLocaleDateString("th-TH")} • แก้ไขล่าสุด {new Date(activity.eventUpdateAt).toLocaleDateString("th-TH")}
                 </Typography>
               </Box>
             </Box>
