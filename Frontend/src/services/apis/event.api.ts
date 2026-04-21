@@ -26,3 +26,11 @@ export async function getAllEventsAPI() {
     }
     throw new Error("Failed to fetch events")
 }
+
+export async function getEventByIdAPI(eventID: number) {
+    const res = await AxiosInstance.get(`/event/${eventID}`)
+    if (res.status === 200) {
+        return res
+    }
+    throw new Error("Failed to fetch event detail")
+}
