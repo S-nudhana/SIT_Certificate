@@ -9,7 +9,7 @@ export default async function updateEventStatus(c: Context) {
     try {
         const eventID = c.req.param('id')
         const status = c.req.query('status')
-        const result = updateEventStatusSchema.safeParse({ eventID, status })
+        const result = updateEventStatusSchema.safeParse({ eventID: Number(eventID), status })
         if (!result.success) {
             return c.json({
                 data: null,

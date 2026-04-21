@@ -12,7 +12,7 @@ export default async function getEventCertificateGenerate(c: Context) {
     let tempDir = ""
     try {
         const eventID = c.req.param("id")
-        const result = getCertificateGenerateSchema.safeParse({ eventID })
+        const result = getCertificateGenerateSchema.safeParse({ eventID: Number(eventID) })
         if (!result.success) {
             return c.json({
                 message: "Input Format is Invalid"

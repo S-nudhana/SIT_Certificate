@@ -6,8 +6,8 @@ import { EventDeleteResponse } from "../../types/event.type";
 
 export default async function deleteEvent(c: Context) {
     try {
-        const id = c.req.param('id')
-        const result = deleteEventSchema.safeParse(id)
+        const eventID = c.req.param('id')
+        const result = deleteEventSchema.safeParse({ eventID: Number(eventID) })
         if (!result.success) {
             return c.json({ data: { status: false }, message: 'Input Format is Invalid' }, 400)
         }
