@@ -9,7 +9,7 @@ import { EventGetCertificateDownloadResponse } from "../../types/certificate.typ
 export default async function getEventCertificateDownload(c: Context) {
     try {
         const eventID = c.req.param("id")
-        const result = getCertificateDownloadSchema.safeParse({ eventID })
+        const result = getCertificateDownloadSchema.safeParse({ eventID: Number(eventID) })
         if (!result.success) {
             return c.json({
                 data: null,
