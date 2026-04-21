@@ -9,14 +9,6 @@ export function useGetAllEvents() {
     })
 }
 
-export function useGetEventById(id: number) {
-  return useQuery({
-    queryKey: ["event", id],
-    queryFn: () => getEventByIdAPI(id),
-    enabled: !!id,
-  })
-}
-
 export function useCreateEvent() {
     const queryClient = useQueryClient()
     return useMutation({

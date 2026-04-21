@@ -57,16 +57,12 @@ export default function EventCard({
             }}
           >
             <Typography sx={{ color: "#6b7280" }}>No Preview Available</Typography>
+            <Divider />
           </Box>
         )}
       </Box>
-
-      <Divider />
-
-      {/* Content */}
       <Box sx={{ p: "20px" }}>
         <Stack spacing={1}>
-          {/* Title */}
           <Typography
             sx={{
               fontSize: "18px",
@@ -79,8 +75,6 @@ export default function EventCard({
           >
             {title}
           </Typography>
-
-          {/* Participants */}
           <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
             <MdGroup size={18} color="#6b7280" />
             <Typography
@@ -93,8 +87,6 @@ export default function EventCard({
               {participants} ผู้เข้าร่วม
             </Typography>
           </Stack>
-
-          {/* Status */}
           <Box sx={{ display: "flex", justifyContent: "flex-start" }}>
             {getStatusBadge(status)}
           </Box>

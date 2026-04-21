@@ -2,7 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 
 import Homepage from "../pages/home.page";
 import Login from "../pages/login.page";
-import ActivityDetailPage from "../pages/eventDetail.page";
+import EventDetail from "../pages/eventDetail.page";
 import CreateEvent from "../pages/createEvent.page";
 import ProtectedRoute from "../middleware/protectedRoute.middleware";
 import PublicRoute from "../middleware/publicRoute.middleware";
@@ -28,7 +28,7 @@ export const router = createBrowserRouter([
     path: "/event/:id",
     element: (
       <ProtectedRoute>
-        <ActivityDetailPage />
+        <EventDetail />
       </ProtectedRoute>
     ),
   },
