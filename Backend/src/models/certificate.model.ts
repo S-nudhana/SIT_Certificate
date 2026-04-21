@@ -36,3 +36,16 @@ export async function getEventCertificateDownloadModel(eventID: number): Promise
         return null
     }
 }
+
+export async function deleteEventCertificateModel(eventID: number): Promise<boolean> {
+    try {
+        const [result] = await db.query<ResultSetHeader>(
+            "DELETE FROM certificates WHERE certificate_eventId = ?",
+            [eventID]
+        )
+        return result.affectedRows > 0
+    } catch (error) {
+        console.error(error)
+        return false
+    }
+}
