@@ -1,4 +1,5 @@
 import { Context } from "hono";
+import path from "path"
 
 import { EventUpdatePayload, EventUpdateResponse } from "../../types/event.type";
 import { TokenData } from "../../types/jwt.type";
@@ -7,6 +8,7 @@ import { updateEventSchema } from "../../validators/event.validators";
 import { countExcelRows } from "../../utils/countExcelRows";
 import { saveFile } from "../../utils/uploadFile"
 import { deleteFile } from "../../utils/deleteFile";
+import { convertPdfToPng } from "../../utils/pdfToPng";
 
 export default async function updateEvent(c: Context) {
     try {
@@ -57,6 +59,19 @@ export default async function updateEvent(c: Context) {
         }
         const certTemplatePath = await saveFile(certTemplate, "templates", result.data.title.replace(/\s+/g, '_') + "_template")
         const certExcelPath = await saveFile(certExcel, "excels", result.data.title.replace(/\s+/g, '_') + "_excel")
+
+        let certPngPath: string = ""
+
+        if (certTemplatePath != null) {
+            const pdfPath = path.join(process.cwd(), certTemplatePath)
+            const certPng = await convertPdfToPng(pdfPath)
+            certPngPath = await saveFile(
+                certPng,
+                "certificatePng",
+                result.data.title.replace(/\s+/g, '_') + "_template_" + Date.now()
+            )
+        }
+
         let participantCount = 0
         if (certExcelPath !== null) {
             participantCount = countExcelRows(certExcelPath)
@@ -77,6 +92,7 @@ export default async function updateEvent(c: Context) {
             status: "created",
             certTemplate: certTemplatePath,
             certExcel: certExcelPath,
+            certPng: certPngPath,
             textSize: result.data.textSize,
             textXPos: result.data.textXPos,
             textYPos: result.data.textYPos,
