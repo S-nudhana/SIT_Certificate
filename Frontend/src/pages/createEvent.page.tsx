@@ -28,6 +28,8 @@ import PdfViewer from "../components/PDFViewer.component";
 import ButtonComponent from "../components/button.component";
 import XLSXViewer from "../components/XLSXViewer.component";
 
+import { createEventSchema } from "../validators/event.validator";
+
 export default function CreateEventPage() {
   const navigate = useNavigate();
   const now = new Date();
@@ -39,6 +41,8 @@ export default function CreateEventPage() {
   const [pdfUrl, setPdfUrl] = useState<string | null>();
   const [excelFile, setExcelFile] = useState<File | undefined>();
   const [excelUrl, setExcelUrl] = useState<string | null>();
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [sampleCertificateUrl, setSampleCertificateUrl] = useState<string | null>();
 
@@ -55,6 +59,9 @@ export default function CreateEventPage() {
   const pdfInputRef = useRef<HTMLInputElement>(null);
   const excelInputRef = useRef<HTMLInputElement>(null);
 
+  const clearError = (field: string) =>
+    setErrors((prev) => ({ ...prev, [field]: "" }));
+
   const handleDrop =
     (type: "pdf" | "excel") => async (e: React.DragEvent<HTMLDivElement>) => {
       e.preventDefault();
@@ -63,11 +70,12 @@ export default function CreateEventPage() {
       if (type === "pdf") {
         setPdfFile(file);
         setPdfUrl(URL.createObjectURL(file));
+        clearError("pdfFile");
         handleSampleCertificate(file);
-      }
-      else {
+      } else {
         setExcelFile(file);
         setExcelUrl(URL.createObjectURL(file));
+        clearError("excelFile");
       }
     };
 
@@ -102,6 +110,27 @@ export default function CreateEventPage() {
   };
 
   const handleCreateEvent = async () => {
+    const result = createEventSchema.safeParse({
+      activityName,
+      pdfFile,
+      excelFile,
+      fontSize: Number(fieldConfig.fontSize),
+      top: Number(fieldConfig.top),
+      left: Number(fieldConfig.left),
+    });
+
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.issues.forEach((err) => {
+        const field = err.path[0] as string;
+        fieldErrors[field] = err.message;
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+
+    setErrors({});
+
     try {
       const res = await createEventAPI({
         title: activityName,
@@ -121,7 +150,7 @@ export default function CreateEventPage() {
       console.error("Error creating event:", error);
       alert("เกิดข้อผิดพลาดในการสร้างกิจกรรม");
     }
-  }
+  };
 
   useEffect(() => {
     return () => {
@@ -149,10 +178,15 @@ export default function CreateEventPage() {
                     {isEditingName ? (
                       <TextField
                         value={activityName}
-                        onChange={(e) => setActivityName(e.target.value)}
+                        onChange={(e) => {
+                          setActivityName(e.target.value);
+                          clearError("activityName");
+                        }}
                         onBlur={() => setIsEditingName(false)}
                         onKeyDown={(e) => e.key === "Enter" && setIsEditingName(false)}
                         autoFocus
+                        error={!!errors.activityName}
+                        helperText={errors.activityName}
                         sx={{
                           "& .MuiInputBase-root": {
                             fontSize: "1rem",
@@ -165,12 +199,24 @@ export default function CreateEventPage() {
                         }}
                       />
                     ) : (
-                      <Typography
-                        sx={{ fontSize: "24px", fontWeight: 700, color: "#1e293b", cursor: "pointer" }}
-                        onClick={() => setIsEditingName(true)}
-                      >
-                        {activityName}
-                      </Typography>
+                      <Box>
+                        <Typography
+                          sx={{
+                            fontSize: "24px",
+                            fontWeight: 700,
+                            color: errors.activityName ? "#ef4444" : "#1e293b",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => setIsEditingName(true)}
+                        >
+                          {activityName}
+                        </Typography>
+                        {errors.activityName && (
+                          <Typography sx={{ color: "#ef4444", fontSize: "12px" }}>
+                            {errors.activityName}
+                          </Typography>
+                        )}
+                      </Box>
                     )}
                     <Button
                       onClick={() => setIsEditingName(true)}
@@ -207,8 +253,6 @@ export default function CreateEventPage() {
               <MdDelete size={20} />
             </Button>
           </Box>
-
-          {/* Upload Section */}
           <Box>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2 }}>
               <Box
@@ -230,7 +274,6 @@ export default function CreateEventPage() {
                 gap: 3,
               }}
             >
-              {/* Template Upload */}
               <Paper
                 sx={{
                   p: 2,
@@ -239,10 +282,9 @@ export default function CreateEventPage() {
                   backgroundColor: "#fff",
                   display: "flex",
                   flexDirection: "column",
-                  height: "100%"
+                  height: "100%",
                 }}
               >
-                {/* Header */}
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1, pb: "10px" }}>
                   <MdDescription size={20} style={{ color: "#0C86FE" }} />
                   <Typography
@@ -252,16 +294,21 @@ export default function CreateEventPage() {
                     เทมเพลต <span style={{ color: "red" }}>*</span>
                   </Typography>
                 </Box>
-
-                {/* Content */}
                 <Box sx={{ minHeight: "300px", height: "100%" }}>
                   {pdfFile ? (
                     <Box sx={{ width: "100%", gap: 2 }}>
-                      {pdfUrl && <Box sx={{ width: "100%", maxWidth: 700 }}>
-                        <PdfViewer fileUrl={pdfUrl} />
-                      </Box>}
-                      <Box sx={{ pt: '20px' }}>
-                        <ButtonComponent startIcon={<MdUploadFile />} text="อัปโหลดไฟล์ใบประกาศนียบัตรใหม่" width="100%" onclick={() => pdfInputRef.current?.click()} />
+                      {pdfUrl && (
+                        <Box sx={{ width: "100%", maxWidth: 700 }}>
+                          <PdfViewer fileUrl={pdfUrl} />
+                        </Box>
+                      )}
+                      <Box sx={{ pt: "20px" }}>
+                        <ButtonComponent
+                          startIcon={<MdUploadFile />}
+                          text="อัปโหลดไฟล์ใบประกาศนียบัตรใหม่"
+                          width="100%"
+                          onclick={() => pdfInputRef.current?.click()}
+                        />
                         <input
                           ref={pdfInputRef}
                           type="file"
@@ -271,6 +318,7 @@ export default function CreateEventPage() {
                             if (!file) return;
                             setPdfFile(file);
                             setPdfUrl(URL.createObjectURL(file));
+                            clearError("pdfFile");
                             handleSampleCertificate(file);
                           }}
                           style={{ display: "none" }}
@@ -283,7 +331,7 @@ export default function CreateEventPage() {
                       onDrop={handleDrop("pdf")}
                       onDragOver={handleDragOver}
                       sx={{
-                        border: "2px dashed #e2e8f0",
+                        border: `2px dashed ${errors.pdfFile ? "#ef4444" : "#e2e8f0"}`,
                         borderRadius: "8px",
                         textAlign: "center",
                         minHeight: "100%",
@@ -295,7 +343,7 @@ export default function CreateEventPage() {
                         justifyContent: "center",
                         cursor: "pointer",
                         transition: "all 0.2s",
-                        backgroundColor: "#f8fafc",
+                        backgroundColor: errors.pdfFile ? "#fff5f5" : "#f8fafc",
                         "&:hover": {
                           borderColor: "#0C86FE",
                           backgroundColor: "#eff6ff",
@@ -309,31 +357,35 @@ export default function CreateEventPage() {
                         onChange={async (e) => {
                           const file = e.target.files?.[0];
                           if (!file) return;
-
                           setPdfFile(file);
                           setPdfUrl(URL.createObjectURL(file));
+                          clearError("pdfFile");
                           handleSampleCertificate(file);
                         }}
                         style={{ display: "none" }}
                       />
-
                       <MdUploadFile
                         size={32}
-                        style={{ color: "#0C86FE", marginBottom: "12px" }}
+                        style={{
+                          color: errors.pdfFile ? "#ef4444" : "#0C86FE",
+                          marginBottom: "12px",
+                        }}
                       />
-
                       <Typography sx={{ fontSize: "14px", color: "#1e293b" }}>
                         อัปโหลดไฟล์ <strong>PDF</strong> เทมเพลตใบประกาศนียบัตร
                       </Typography>
-
                       <Typography sx={{ fontSize: "12px", color: "#94a3b8", pt: 0.5 }}>
                         คลิกหรือลากไฟล์เพื่ออัปโหลด (.pdf เท่านั้น)
                       </Typography>
+                      {errors.pdfFile && (
+                        <Typography sx={{ fontSize: "12px", color: "#ef4444", mt: 1, fontWeight: 500 }}>
+                          {errors.pdfFile}
+                        </Typography>
+                      )}
                     </Box>
                   )}
                 </Box>
               </Paper>
-              {/* Participant List Upload */}
               <Paper
                 sx={{
                   p: 2,
@@ -343,7 +395,7 @@ export default function CreateEventPage() {
                   display: "flex",
                   flexDirection: "column",
                   height: "100%",
-                  width: "100%"
+                  width: "100%",
                 }}
               >
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1, pb: "10px" }}>
@@ -352,29 +404,20 @@ export default function CreateEventPage() {
                     รายชื่อผู้เข้าร่วม <span style={{ color: "red" }}>*</span>
                   </Typography>
                 </Box>
-                <Box sx={{ height: { xs: "300px", md: "435px" }, width: { xs: "calc(100vw - 63px)", md: "100%" }, }}>
+                <Box sx={{ height: { xs: "300px", md: "435px" }, width: { xs: "calc(100vw - 63px)", md: "100%" } }}>
                   {excelFile ? (
-                    <Box
-                      sx={{
-                        width: "100%",
-                        height: "100%",
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 2
-                      }}
-                    >
+                    <Box sx={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", gap: 2 }}>
                       <Box
                         sx={{
                           flex: 1,
                           overflowX: "auto",
                           overflowY: "auto",
                           border: "1px solid #eee",
-                          borderRadius: 2
+                          borderRadius: 2,
                         }}
                       >
                         <XLSXViewer key={excelUrl} file={excelFile} />
                       </Box>
-
                       <ButtonComponent
                         startIcon={<MdUploadFile />}
                         text="อัปโหลดไฟล์รายชื่อผู้เข้าร่วมใหม่"
@@ -388,9 +431,9 @@ export default function CreateEventPage() {
                         onChange={(e) => {
                           const file = e.target.files?.[0];
                           if (!file) return;
-
                           setExcelFile(file);
                           setExcelUrl(URL.createObjectURL(file));
+                          clearError("excelFile");
                         }}
                         style={{ display: "none" }}
                       />
@@ -401,7 +444,7 @@ export default function CreateEventPage() {
                       onDrop={handleDrop("excel")}
                       onDragOver={handleDragOver}
                       sx={{
-                        border: "2px dashed #e2e8f0",
+                        border: `2px dashed ${errors.excelFile ? "#ef4444" : "#e2e8f0"}`,
                         borderRadius: "8px",
                         textAlign: "center",
                         height: "100%",
@@ -411,7 +454,7 @@ export default function CreateEventPage() {
                         justifyContent: "center",
                         cursor: "pointer",
                         transition: "all 0.2s",
-                        backgroundColor: "#f8fafc",
+                        backgroundColor: errors.excelFile ? "#fff5f5" : "#f8fafc",
                         "&:hover": {
                           borderColor: "#0C86FE",
                           backgroundColor: "#eff6ff",
@@ -425,28 +468,36 @@ export default function CreateEventPage() {
                         onChange={(e) => {
                           const file = e.target.files?.[0];
                           if (!file) return;
-
                           setExcelFile(file);
                           setExcelUrl(URL.createObjectURL(file));
+                          clearError("excelFile");
                         }}
                         style={{ display: "none" }}
                       />
-                      <MdUploadFile size={32} style={{ color: "#0C86FE", marginBottom: "12px" }} />
+                      <MdUploadFile
+                        size={32}
+                        style={{
+                          color: errors.excelFile ? "#ef4444" : "#0C86FE",
+                          marginBottom: "12px",
+                        }}
+                      />
                       <Typography sx={{ fontSize: "14px", color: "#1e293b", display: "block" }}>
                         อัปโหลดไฟล์รายชื่อ <strong>Excel</strong>
                       </Typography>
                       <Typography sx={{ fontSize: "12px", color: "#94a3b8", display: "block", mt: 0.5 }}>
                         คอลัมน์: ชื่อ นามสกุล อีเมล (.xlsx เท่านั้น)
                       </Typography>
+                      {errors.excelFile && (
+                        <Typography sx={{ fontSize: "12px", color: "#ef4444", mt: 1, fontWeight: 500 }}>
+                          {errors.excelFile}
+                        </Typography>
+                      )}
                     </Box>
                   )}
                 </Box>
               </Paper>
             </Box>
-
           </Box>
-
-          {/* Field Config Section */}
           <Box>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2 }}>
               <Box
@@ -461,15 +512,8 @@ export default function CreateEventPage() {
                 กำหนดจุด
               </Typography>
             </Box>
-            <Paper
-              sx={{
-                p: 3,
-                borderRadius: "12px",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-              }}
-            >
+            <Paper sx={{ p: 3, borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
               <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "2fr 1fr" }, gap: 3 }}>
-                {/* Preview */}
                 {sampleCertificateUrl ? (
                   <Box sx={{ width: "100%", maxWidth: 700 }}>
                     <PdfViewer fileUrl={sampleCertificateUrl} />
@@ -505,8 +549,6 @@ export default function CreateEventPage() {
                     </Typography>
                   </Box>
                 )}
-
-                {/* Controls */}
                 <Stack spacing={2}>
                   <Box>
                     <Typography sx={{ fontSize: "14px", color: "#64748b", display: "block", mb: 0.5 }}>
@@ -515,14 +557,14 @@ export default function CreateEventPage() {
                     <TextField
                       type="number"
                       value={fieldConfig.fontSize}
-                      onChange={(e) =>
-                        setFieldConfig((prev) => ({
-                          ...prev,
-                          fontSize: e.target.value
-                        }))
-                      }
+                      onChange={(e) => {
+                        setFieldConfig((prev) => ({ ...prev, fontSize: e.target.value }));
+                        clearError("fontSize");
+                      }}
                       fullWidth
                       size="small"
+                      error={!!errors.fontSize}
+                      helperText={errors.fontSize}
                     />
                   </Box>
                   <Box>
@@ -532,14 +574,14 @@ export default function CreateEventPage() {
                     <TextField
                       type="number"
                       value={fieldConfig.top}
-                      onChange={(e) =>
-                        setFieldConfig((prev) => ({
-                          ...prev,
-                          top: e.target.value
-                        }))
-                      }
+                      onChange={(e) => {
+                        setFieldConfig((prev) => ({ ...prev, top: e.target.value }));
+                        clearError("top");
+                      }}
                       fullWidth
                       size="small"
+                      error={!!errors.top}
+                      helperText={errors.top}
                     />
                   </Box>
                   <Box>
@@ -549,14 +591,14 @@ export default function CreateEventPage() {
                     <TextField
                       type="number"
                       value={fieldConfig.left}
-                      onChange={(e) =>
-                        setFieldConfig((prev) => ({
-                          ...prev,
-                          left: e.target.value
-                        }))
-                      }
+                      onChange={(e) => {
+                        setFieldConfig((prev) => ({ ...prev, left: e.target.value }));
+                        clearError("left");
+                      }}
                       fullWidth
                       size="small"
+                      error={!!errors.left}
+                      helperText={errors.left}
                     />
                   </Box>
                   <ButtonComponent
@@ -564,33 +606,20 @@ export default function CreateEventPage() {
                     onclick={() => handleSampleCertificate(pdfFile!)}
                     text="ยืนยัน"
                   />
-
                 </Stack>
-                {/* <Button
-                  variant="contained"
-                  sx={{ mt: 2 }}
-                  onClick={() => {
-                    if (!sampleCertificateUrl) return;
-
-                    const a = document.createElement("a");
-                    a.href = sampleCertificateUrl;
-                    a.download = "sample-certificate.pdf";
-                    a.click();
-                  }}
-                >
-                  ดาวน์โหลดตัวอย่าง PDF
-                </Button> */}
               </Box>
             </Paper>
             <Box sx={{ pt: "20px" }}>
-              <ButtonComponent startIcon={<MdSettings size={16} />}
+              <ButtonComponent
+                startIcon={<MdSettings size={16} />}
                 onclick={handleCreateEvent}
                 text="สร้างกิจกรรม"
-                width="100%" />
+                width="100%"
+              />
             </Box>
           </Box>
-        </Stack >
-      </Container >
-    </Box >
+        </Stack>
+      </Container>
+    </Box>
   );
 }

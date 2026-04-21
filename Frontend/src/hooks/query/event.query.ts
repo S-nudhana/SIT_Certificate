@@ -24,3 +24,13 @@ export function useGetEventById(eventID: number) {
         queryFn: () => getEventByIdAPI(eventID),
     })
 }
+
+export function useUpdateEvent() {
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: createEventAPI,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["events"] })
+        }
+    })
+}

@@ -20,5 +20,34 @@ export async function getSampleCertificateAPI(payload: GetSampleCertificatePaylo
         }
     )
 
-    return res
+    if (res.status === 200) {
+        return res
+    }
+    throw new Error("Failed to generate sample certificate")
+}
+
+export async function generateCertificateAPI(eventID: number) {
+    const res = await AxiosInstance.get(`/certificate/generate/${eventID}`)
+    if (res.status === 200) {
+        return true
+    }
+    throw new Error("Failed to generate certificate")
+}
+
+export async function getDownloadCertificateAPI(eventID: number) {
+    const res = await AxiosInstance.get(`/certificate/download/${eventID}`, {
+        responseType: "blob",
+    })
+    if (res.status === 200) {
+        return res
+    }
+    throw new Error("Failed to download certificate")
+}
+
+export async function regenerateCertificateAPI(eventID: number) {
+    const res = await AxiosInstance.get(`/certificate/regenerate/${eventID}`)
+    if (res.status === 200) {
+        return res
+    }
+    throw new Error("Failed to regenerate certificate")
 }
