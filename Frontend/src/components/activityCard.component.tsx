@@ -105,7 +105,6 @@ export default function ActivityCard({
         },
       }}
     >
-      {/* Image Placeholder */}
       <CardMedia
         sx={{
           height: 200,
@@ -125,7 +124,6 @@ export default function ActivityCard({
 
       <CardContent sx={{ pb: 2 }}>
         <Stack spacing={2}>
-          {/* Title with Menu */}
           <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "flex-start" }}>
             <Typography
               variant="h6"
@@ -154,8 +152,6 @@ export default function ActivityCard({
               <MdMoreVert size={18} />
             </Button>
           </Stack>
-
-          {/* Status Menu */}
           <Menu
             anchorEl={anchorEl}
             open={menuOpen}
@@ -185,8 +181,6 @@ export default function ActivityCard({
               ลบกิจกรรม
             </MenuItem>
           </Menu>
-
-          {/* Participants Line */}
           <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
             <MdGroup style={{ fontSize: "1.2rem", color: "#64748b" }} />
             <Typography
@@ -199,8 +193,6 @@ export default function ActivityCard({
               {participants} ผู้เข้าร่วม
             </Typography>
           </Stack>
-
-          {/* Status Badge */}
           <Box>{getStatusBadge()}</Box>
         </Stack>
       </CardContent>

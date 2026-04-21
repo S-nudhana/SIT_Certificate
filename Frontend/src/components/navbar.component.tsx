@@ -45,7 +45,6 @@ export default function Navbar(props: HideOnScrollProps) {
 
   return (
     <React.Fragment>
-
       <HideOnScroll {...props}>
         <AppBar
           position="static"
@@ -62,7 +61,6 @@ export default function Navbar(props: HideOnScrollProps) {
               py: 1.5,
             }}
           >
-            {/* Logo Section */}
             <Box onClick={() => navigate("/")} sx={{ display: "flex", alignItems: "center", gap: 1, cursor: "pointer" }}>
               <img
                 src={logo}
@@ -70,8 +68,6 @@ export default function Navbar(props: HideOnScrollProps) {
                 style={{ height: 45, width: "auto" }}
               />
             </Box>
-
-            {/* Right Section - Avatar & Logout */}
             <Stack
               direction="row"
               spacing={3}
@@ -93,7 +89,6 @@ export default function Navbar(props: HideOnScrollProps) {
                   {firstname}
                 </Box>
               </Stack>
-
               <Button
                 variant="outlined"
                 size="small"

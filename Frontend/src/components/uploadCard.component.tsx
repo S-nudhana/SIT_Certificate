@@ -63,10 +63,7 @@ export default function UploadCard({
             py: 4,
           }}
         >
-          {/* Icon */}
           {icon}
-
-          {/* Title */}
           <Typography
             variant="subtitle1"
             sx={{
@@ -77,8 +74,6 @@ export default function UploadCard({
           >
             {title}
           </Typography>
-
-          {/* Subtitle */}
           <Typography
             variant="body2"
             sx={{
@@ -89,7 +84,6 @@ export default function UploadCard({
           >
             {subtitle}
           </Typography>
-
           {acceptedFormats && (
             <Typography
               variant="caption"

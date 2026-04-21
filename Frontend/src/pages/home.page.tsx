@@ -45,10 +45,7 @@ export default function Homepage() {
 
   return (
     <Box sx={{ backgroundColor: "#f9fafb", minHeight: "100vh" }}>
-      {/* Navbar */}
       <Navbar />
-
-      {/* Hero Section */}
       <Box sx={{ textAlign: "center", py: 8, px: 2 }}>
         <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", gap: "10px" }}>
           <Typography sx={{
@@ -79,8 +76,6 @@ export default function Homepage() {
         >
           ระบบจัดการชุดใบประกาศนียบัตร
         </Typography>
-
-        {/* Search */}
         <Box
           sx={{
             display: "flex",
@@ -124,10 +119,7 @@ export default function Homepage() {
           />
         </Box>
       </Box>
-
-      {/* Activities Section */}
       <Container maxWidth="lg" sx={{ pb: 8 }}>
-        {/* Header */}
         <Stack
           direction="row"
           spacing={2}
@@ -158,9 +150,6 @@ export default function Homepage() {
             rounded
           />
         </Stack>
-
-        {/* Activity Cards Grid */}
-
         {filteredActivities.length === 0 ? (
           <Box sx={{
             display: "flex",
