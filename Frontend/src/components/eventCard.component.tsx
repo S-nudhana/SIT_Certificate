@@ -41,7 +41,6 @@ export default function EventCard({
         },
       }}
     >
-      {/* PDF Preview */}
       <Box>
         {fullImageUrl ? (
           <img src={fullImageUrl} alt="Event Cover" style={{ width: "100%", height: "100%", objectFit: "cover" }} />

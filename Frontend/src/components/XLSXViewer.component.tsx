@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Box, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material"
+import { Box, Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material"
 import * as XLSX from "xlsx"
 
 interface Props {
@@ -13,7 +13,9 @@ export default function XLSXViewer({ file, onDataLoaded }: Props) {
 
     useEffect(() => {
         if (!file) return
+
         const reader = new FileReader()
+
         reader.onload = (e) => {
             const data = e.target?.result
             if (!data) return
@@ -31,9 +33,11 @@ export default function XLSXViewer({ file, onDataLoaded }: Props) {
         }
         reader.readAsArrayBuffer(file)
     }, [file])
+
     if (!rows.length) {
         return <></>
     }
+
     return (
         <Box
             sx={{

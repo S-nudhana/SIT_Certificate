@@ -217,7 +217,6 @@ export default function EventDetailPage() {
       <Navbar />
       <Container sx={{ py: 4 }}>
         <Stack spacing={4}>
-          {/* Header */}
           <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
             <Box sx={{ display: "flex", alignItems: "flex-start", gap: 2, flex: 1 }}>
               <BackBTN />
@@ -266,8 +265,6 @@ export default function EventDetailPage() {
               <MdDelete size={20} />
             </Button>
           </Box>
-
-          {/* Upload Section */}
           <Box>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2 }}>
               <Box sx={{ width: 5, height: 30, background: "linear-gradient(180deg, #557fe8, #44B0FF)", borderRadius: "9999px" }} />
@@ -275,7 +272,6 @@ export default function EventDetailPage() {
             </Box>
 
             <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: 3 }}>
-              {/* PDF Template Upload */}
               <Paper sx={{ p: 2, borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)", backgroundColor: "#fff", display: "flex", flexDirection: "column", height: "100%" }}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1, pb: "10px" }}>
                   <MdDescription size={20} style={{ color: "#0C86FE" }} />
@@ -356,8 +352,6 @@ export default function EventDetailPage() {
                   )}
                 </Box>
               </Paper>
-
-              {/* Excel Participant Upload */}
               <Paper sx={{ p: 2, borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)", backgroundColor: "#fff", display: "flex", flexDirection: "column", height: "100%", width: "100%" }}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1, pb: "10px" }}>
                   <MdGroup size={20} style={{ color: "#0C86FE" }} />
@@ -440,8 +434,6 @@ export default function EventDetailPage() {
               </Paper>
             </Box>
           </Box>
-
-          {/* Field Config Section */}
           <Box>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 2 }}>
               <Box sx={{ width: 5, height: 30, background: "linear-gradient(180deg, #557fe8, #44B0FF)", borderRadius: "9999px" }} />
@@ -526,8 +518,6 @@ export default function EventDetailPage() {
               </Box>
             </Paper>
           </Box>
-
-          {/* Generate Section */}
           <Paper sx={{ p: 2.5, borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
             <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 2, alignItems: "center", justifyContent: "space-between" }}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
@@ -542,8 +532,6 @@ export default function EventDetailPage() {
               />
             </Box>
           </Paper>
-
-          {/* Send Email Section (disabled) */}
           <Paper sx={{ p: 2.5, borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)", opacity: 0.6 }}>
             <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, justifyContent: { xs: "start", md: "space-between" }, alignItems: { xs: "start", md: "center" } }}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
