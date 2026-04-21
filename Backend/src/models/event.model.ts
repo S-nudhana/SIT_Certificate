@@ -81,7 +81,7 @@ export async function getAllEventsModel(): Promise<EventGetAllResponse[] | null>
 export async function getEventByIdModel(eventId: number): Promise<EventGetByIDResponse | null> {
     try {
         const [rows] = await db.query<EventFullDetailQuery[]>(
-            "SELECT event_id, event_title, event_participants, event_certificate_template, event_certificate_excel, event_status, event_createAt, event_updateAt FROM events WHERE event_id = ?",
+            "SELECT event_id, event_title, event_participants, event_certificate_template, event_certificate_excel, event_status, event_createAt, event_updateAt, event_text_size, event_text_x_pos, event_text_y_pos FROM events WHERE event_id = ?",
             [eventId]
         )
         if (!rows || rows.length === 0) {
@@ -94,6 +94,9 @@ export async function getEventByIdModel(eventId: number): Promise<EventGetByIDRe
             excelURL: rows[0].event_certificate_excel,
             eventStatus: rows[0].event_status,
             eventParticipant: rows[0].event_participants,
+            eventTextSize: rows[0].event_text_size,
+            eventTextXPos: rows[0].event_text_x_pos,
+            eventTextYPos: rows[0].event_text_y_pos,
             eventCreateAt: rows[0].event_createAt,
             eventUpdateAt: rows[0].event_updateAt
         }
@@ -102,7 +105,6 @@ export async function getEventByIdModel(eventId: number): Promise<EventGetByIDRe
         return null
     }
 }
-
 export async function getEventCertificateTemplateExcelModel(eventID: number): Promise<EventGetCertificateTemplateResponse | null> {
     try {
         const [rows] = await db.query<EventGetCertificateTemplateQuery[]>(

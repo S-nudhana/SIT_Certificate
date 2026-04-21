@@ -50,6 +50,9 @@ export interface EventGetByIDResponse {
     excelURL: string
     eventStatus: string
     eventParticipant: number
+    eventTextSize: number
+    eventTextXPos: number
+    eventTextYPos: number
     eventCreateAt: Date
     eventUpdateAt: Date
 }
