@@ -47,7 +47,7 @@ export async function updateEventByIdAPI(payload: UpdateEventPayload) {
     formData.append("textYPos", payload.textY.toString())
 
     const res = await AxiosInstance.put(`/event/${payload.eventID}`, formData)
-    if (res.status === 200) {
+    if (res.status === 200 || res.status === 201) {
         return res
     }
     throw new Error("Failed to update event")

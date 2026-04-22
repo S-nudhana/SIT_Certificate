@@ -15,6 +15,7 @@ import {
   MdSettings,
   MdDelete,
   MdUploadFile,
+  MdOutlineFileUpload
 } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 
@@ -611,7 +612,7 @@ export default function CreateEventPage() {
             </Paper>
             <Box sx={{ pt: "20px" }}>
               <ButtonComponent
-                startIcon={<MdSettings size={16} />}
+                startIcon={<MdOutlineFileUpload size={16} />}
                 onclick={handleCreateEvent}
                 text="สร้างกิจกรรม"
                 width="100%"

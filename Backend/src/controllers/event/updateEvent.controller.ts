@@ -21,9 +21,9 @@ export default async function updateEvent(c: Context) {
 
         const certTemplate = body.certTemplate as File
         const certExcel = body.certExcel as File
-
+        const eventID = Number(c.req.param("id"))
         const result = updateEventSchema.safeParse({
-            eventID: c.req.param('id'),
+            eventID,
             title,
             textSize,
             textXPos,
@@ -50,12 +50,25 @@ export default async function updateEvent(c: Context) {
                 message: "Files are required"
             }, 400)
         }
+        if (certTemplate.type !== "application/pdf") {
+            return c.json({
+                message: "Certificate template must be a PDF file"
+            }, 400)
+        }
+        if (certExcel.type !== "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+            return c.json({
+                message: "Excel file must be .xlsx"
+            }, 400)
+        }
         const eventTemplate = await getEventCertificateTemplateExcelModel(result.data.eventID)
         if (eventTemplate !== null && eventTemplate.certificateTemplate !== null) {
             await deleteFile(eventTemplate.certificateTemplate)
         }
         if (eventTemplate !== null && eventTemplate.certificateExcel !== null) {
             await deleteFile(eventTemplate.certificateExcel)
+        }
+        if (eventTemplate !== null && eventTemplate.certificatePng !== null) {
+            await deleteFile(eventTemplate.certificatePng)
         }
         const certTemplatePath = await saveFile(certTemplate, "templates", result.data.title.replace(/\s+/g, '_') + "_template")
         const certExcelPath = await saveFile(certExcel, "excels", result.data.title.replace(/\s+/g, '_') + "_excel")
@@ -101,11 +114,11 @@ export default async function updateEvent(c: Context) {
         }
         const updateEvent: EventUpdateResponse = await updateEventModel(eventPayload)
         if (!updateEvent.status) {
-            return c.json({ data: { eventID: -1 }, message: "Failed to Update Event" }, 500)
+            return c.json({ message: "Failed to Update Event" }, 500)
         }
-        return c.json({ data: { eventID: updateEvent.eventID }, message: "Event Updated" }, 201)
+        return c.json({ message: "Event Updated" }, 201)
     } catch (error) {
         console.error(error)
-        return c.json({ data: { eventID: -1 }, message: "Internal Server Error" }, 500)
+        return c.json({ message: "Internal Server Error" }, 500)
     }
 }
