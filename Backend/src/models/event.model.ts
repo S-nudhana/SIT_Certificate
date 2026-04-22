@@ -108,7 +108,7 @@ export async function getEventByIdModel(eventId: number): Promise<EventGetByIDRe
 export async function getEventCertificateTemplateExcelModel(eventID: number): Promise<EventGetCertificateTemplateResponse | null> {
     try {
         const [rows] = await db.query<EventGetCertificateTemplateQuery[]>(
-            "SELECT event_certificate_template, event_certificate_excel, event_text_size, event_text_x_position, event_text_y_pos FROM events WHERE event_id = ?",
+            "SELECT event_certificate_template, event_certificate_excel, event_certificate_png, event_text_size, event_text_x_pos, event_text_y_pos FROM events WHERE event_id = ?",
             [eventID]
         )
         if (!rows || rows.length === 0) {
@@ -117,8 +117,9 @@ export async function getEventCertificateTemplateExcelModel(eventID: number): Pr
         return {
             certificateTemplate: rows[0].event_certificate_template || null,
             certificateExcel: rows[0].event_certificate_excel || null,
+            certificatePng: rows[0].event_certificate_png || null,
             textSize: rows[0].event_text_size,
-            textXPosition: rows[0].event_text_x_position,
+            textXPosition: rows[0].event_text_x_pos,
             textYPosition: rows[0].event_text_y_pos
         }
     } catch (error) {

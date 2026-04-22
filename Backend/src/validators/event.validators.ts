@@ -30,7 +30,8 @@ export const updateEventSchema = z.object({
     title: z
         .string()
         .min(1, 'Title is required')
-        .max(255, 'Title too long'),
+        .max(100, 'Title too long'),
+    
     textSize: z
         .number()
         .refine((value) => !isNaN(value), {

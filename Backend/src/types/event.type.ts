@@ -28,6 +28,7 @@ export interface EventGetCertificateTemplateQuery extends RowDataPacket {
 export interface EventGetCertificateTemplateResponse {
     certificateTemplate: string | null
     certificateExcel: string | null
+    certificatePng: string | null
     textSize: number
     textXPosition: number
     textYPosition: number
