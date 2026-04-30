@@ -52,3 +52,11 @@ export async function updateEventByIdAPI(payload: UpdateEventPayload) {
     }
     throw new Error("Failed to update event")
 }
+
+export async function deleteEventByIdAPI(eventID: number) {
+    const res = await AxiosInstance.delete(`/event/${eventID}`)
+    if (res.status === 200) {
+        return res
+    }
+    throw new Error("Failed to delete event")
+}

@@ -6,7 +6,6 @@ import authMiddleware from '../middlewares/auth.middleware'
 import getCertificateGenerate from '../controllers/certificate/getCertificateGenerate.controller'
 import getCertificateDownload from '../controllers/certificate/getCertificateDownload.controller'
 import getCertificateSampleGenerate from '../controllers/certificate/getCertificateSampleGenerate.controller'
-import getRegenerateCertificate from '../controllers/certificate/getCertificateRegenerate.controller'
 
 const certificate = new OpenAPIHono()
 const protectedCertificateMiddleware = authMiddleware(['ADMIN', 'PROFESSOR'])
@@ -118,26 +117,4 @@ const sampleCertificateRoute = createRoute({
     }
 })
 certificate.openapi(sampleCertificateRoute, getCertificateSampleGenerate)
-
-const regenerateCertificateRoute = createRoute({
-    method: 'get',
-    path: '/regenerate/{id}',
-    tags: ['Certificate'],
-    request: {
-        params: z.object({
-            id: z.string()
-        })
-    },
-    responses: {
-        200: {
-            description: 'Regenerate certificates'
-        },
-        500: {
-            description: 'Internal Server Error'
-        }
-    }
-})
-certificate.openapi(regenerateCertificateRoute, getRegenerateCertificate)
-
-
 export default certificate

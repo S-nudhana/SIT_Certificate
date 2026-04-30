@@ -44,10 +44,16 @@ export async function updateEventModel(event: EventUpdatePayload): Promise<Event
 
 export async function deleteEventModel(eventId: number): Promise<EventDeleteResponse> {
     try {
+        await db.query<ResultSetHeader>(
+            "DELETE FROM certificates WHERE certificate_eventId = ?",
+            [eventId]
+        )
+
         const [result] = await db.query<ResultSetHeader>(
             "DELETE FROM events WHERE event_id = ?",
             [eventId]
         )
+
         return { status: result.affectedRows > 0 }
     } catch (error) {
         console.error(error)
