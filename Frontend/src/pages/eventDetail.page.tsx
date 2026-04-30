@@ -29,7 +29,7 @@ import PdfViewer from "../components/PDFViewer.component"
 import ButtonComponent from "../components/button.component"
 import XLSXViewer from "../components/XLSXViewer.component"
 import { useGetEventById } from "../hooks/query/event.query"
-import { getSampleCertificateAPI } from "../services/apis/certificate.api"
+import { getSampleCertificateAPI, generateCertificateAPI } from "../services/apis/certificate.api"
 import { updateEventByIdAPI } from "../services/apis/event.api"
 import { updateEventSchema } from "../validators/event.validator"
 
@@ -231,6 +231,16 @@ export default function EventDetailPage() {
       alert("เกิดข้อผิดพลาดในการอัปเดตกิจกรรม")
     } finally {
       setIsUpdating(false)
+    }
+  }
+
+  const handleGenerateCertificate = async () => {
+    try {
+      const res = await generateCertificateAPI(Number(id))
+      console.log(res)
+    } catch (error) {
+      console.error("Error generating certificate:", error)
+      alert("เกิดข้อผิดพลาดในการสร้างใบรับรอง")
     }
   }
 
@@ -622,7 +632,7 @@ export default function EventDetailPage() {
               </Box>
               <ButtonComponent
                 endIcon={<MdTipsAndUpdates size={16} />}
-                onclick={() => {/* TODO */ }}
+                onclick={handleGenerateCertificate}
                 text="สร้างใบประกาศนียบัตร"
                 width={{ xs: "100%", md: "auto" }}
               />
