@@ -29,7 +29,7 @@ export async function getSampleCertificateAPI(payload: GetSampleCertificatePaylo
 export async function generateCertificateAPI(eventID: number) {
     const res = await AxiosInstance.get(`/certificate/${eventID}/generate`)
     if (res.status === 200) {
-        return true
+        return res
     }
     throw new Error("Failed to generate certificate")
 }

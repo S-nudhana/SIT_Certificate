@@ -4,7 +4,7 @@ import path from "path"
 import XLSX from "xlsx"
 
 import { getCertificateGenerateSchema } from "../../validators/certificate.validators"
-import { getEventCertificateTemplateExcelModel } from "../../models/event.model"
+import { getEventCertificateTemplateExcelModel, updateEventStatusModel } from "../../models/event.model"
 import { insertCertificateRecord, getEventCertificateDownloadModel, deleteEventCertificateModel } from "../../models/certificate.model"
 import { fetchAndFillCertificate } from "../../utils/certificate"
 
@@ -82,7 +82,12 @@ export default async function getEventCertificateGenerate(c: Context) {
             await insertCertificateRecord(result.data.eventID, cert.email, certPath)
         }
 
-        return c.json({ message: "Certificates generated successfully" })
+        const statusRes = await updateEventStatusModel(result.data.eventID, "cert_generated")
+        if (!statusRes || !statusRes.status) {
+            return c.json({ message: "Failed to update event status" }, 500)
+        }
+
+        return c.json({status: "cert_generated", message: "Certificates generated successfully" })
     } catch (error) {
         console.error(error)
         return c.json({ message: "Internal Server Error" }, 500)

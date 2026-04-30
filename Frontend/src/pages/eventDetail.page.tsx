@@ -19,6 +19,7 @@ import {
   MdUploadFile,
   MdOutlineFileUpload,
   MdCheck,
+  MdFileDownload
 } from "react-icons/md"
 import { useNavigate, useParams } from "react-router-dom"
 
@@ -30,7 +31,7 @@ import ButtonComponent from "../components/button.component"
 import XLSXViewer from "../components/XLSXViewer.component"
 import { useGetEventById } from "../hooks/query/event.query"
 import { getSampleCertificateAPI, generateCertificateAPI } from "../services/apis/certificate.api"
-import { updateEventByIdAPI } from "../services/apis/event.api"
+import { updateEventByIdAPI, deleteEventByIdAPI } from "../services/apis/event.api"
 import { updateEventSchema } from "../validators/event.validator"
 
 import type { FieldConfig } from "../types/event/eventDetail.type"
@@ -50,6 +51,7 @@ export default function EventDetailPage() {
 
   const [activityName, setActivityName] = useState<string>("")
   const [isEditingName, setIsEditingName] = useState(false)
+  const [status, setStatus] = useState<string>("created")
   const activityLoaded = useRef(false)
 
   const [fieldConfig, setFieldConfig] = useState<FieldConfig>({
@@ -74,11 +76,15 @@ export default function EventDetailPage() {
 
   const pdfInputRef = useRef<HTMLInputElement>(null)
   const excelInputRef = useRef<HTMLInputElement>(null)
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [generateSuccess, setGenerateSuccess] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
     if (!activity || activityLoaded.current) return
     activityLoaded.current = true
     setActivityName(activity.eventTitle ?? "")
+    setStatus(activity.eventStatus ?? "created")
     setFieldConfig({
       fontSize: activity.eventTextSize ?? "24",
       top: activity.eventTextYPos ?? "50",
@@ -110,6 +116,20 @@ export default function EventDetailPage() {
         .catch(() => setExcelFileFromUrl(undefined))
     }
   }, [activity])
+
+  const handleDeleteEvent = async () => {
+    if (!window.confirm("คุณต้องการลบกิจกรรมนี้ใช่หรือไม่?")) return
+    setIsDeleting(true)
+    try {
+      await deleteEventByIdAPI(Number(id))
+      navigate("/")
+    } catch (error) {
+      console.error("Error deleting event:", error)
+      alert("เกิดข้อผิดพลาดในการลบกิจกรรม")
+    } finally {
+      setIsDeleting(false)
+    }
+  }
 
   const handleSampleCertificate = useCallback(
     async (file: File) => {
@@ -225,6 +245,7 @@ export default function EventDetailPage() {
       if (res.status === 200 || res.status === 201) {
         setUpdateSuccess(true)
         setTimeout(() => setUpdateSuccess(false), 3000)
+        setStatus("created")
       }
     } catch (error) {
       console.error("Error updating event:", error)
@@ -235,12 +256,17 @@ export default function EventDetailPage() {
   }
 
   const handleGenerateCertificate = async () => {
+    setIsGenerating(true)
     try {
       const res = await generateCertificateAPI(Number(id))
-      console.log(res)
+      setStatus(res.data.status)
+      setGenerateSuccess(true)
+      setTimeout(() => setGenerateSuccess(false), 3000)
     } catch (error) {
       console.error("Error generating certificate:", error)
       alert("เกิดข้อผิดพลาดในการสร้างใบรับรอง")
+    } finally {
+      setIsGenerating(false)
     }
   }
 
@@ -324,9 +350,14 @@ export default function EventDetailPage() {
               </Box>
             </Box>
             <Button
+              onClick={handleDeleteEvent}
+              disabled={isDeleting}
               sx={{ minWidth: "auto", color: "#ef4444", padding: "8px", "&:hover": { backgroundColor: "#fee2e2" } }}
             >
-              <MdDelete size={20} />
+              {isDeleting
+                ? <CircularProgress size={20} sx={{ color: "#ef4444" }} />
+                : <MdDelete size={20} />
+              }
             </Button>
           </Box>
           <Box>
@@ -630,12 +661,23 @@ export default function EventDetailPage() {
                 <MdTipsAndUpdates size={18} style={{ color: "#0C86FE" }} />
                 <Typography sx={{ fontSize: "16px", fontWeight: 600, color: "#1e293b" }}>สร้างและดาวน์โหลดใบประกาศนียบัตรทั้งหมด</Typography>
               </Box>
-              <ButtonComponent
-                endIcon={<MdTipsAndUpdates size={16} />}
-                onclick={handleGenerateCertificate}
-                text="สร้างใบประกาศนียบัตร"
-                width={{ xs: "100%", md: "auto" }}
-              />
+              <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", justifyContent: { xs: "center", md: "flex-end" } }}>
+                <ButtonComponent
+                  endIcon={
+                    isGenerating
+                      ? <CircularProgress size={16} sx={{ color: "#fff" }} />
+                      : generateSuccess
+                        ? <MdCheck size={16} />
+                        : <MdTipsAndUpdates size={16} />
+                  }
+                  onclick={isGenerating ? undefined : handleGenerateCertificate}
+                  text={isGenerating ? "กำลังสร้าง..." : generateSuccess ? "สร้างสำเร็จ!" : "สร้างใบประกาศนียบัตร"}
+                  width={{ xs: "100%", md: "auto" }}
+                />
+                <Button variant="outlined" endIcon={<MdFileDownload size={16} />} sx={{ display: status === "cert_generated" ? "" : "none", borderColor: "#0C86FE", color: "#0C86FE", "&:hover": { borderColor: "#0C86FE", backgroundColor: "rgba(12, 134, 254, 0.1)" } }}>
+                  ดาวน์โหลดใบประกาศนียบัตร
+                </Button>
+              </Box>
             </Box>
           </Paper>
           <Paper sx={{ p: 2.5, borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)", opacity: 0.6 }}>
