@@ -51,3 +51,13 @@ export async function regenerateCertificateAPI(eventID: number) {
     }
     throw new Error("Failed to regenerate certificate")
 }
+
+export async function getCertificatezipAPI(eventID: number) {
+    const res = await AxiosInstance.get(`/certificate/${eventID}/download`, {
+        responseType: 'arraybuffer'
+    })
+    if (res.status === 200) {
+        return res
+    }
+    throw new Error("Failed to fetch certificate zip")
+}

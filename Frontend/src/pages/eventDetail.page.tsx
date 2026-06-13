@@ -8,6 +8,11 @@ import {
   Paper,
   Container,
   CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions
 } from "@mui/material"
 import {
   MdEdit,
@@ -30,7 +35,7 @@ import PdfViewer from "../components/PDFViewer.component"
 import ButtonComponent from "../components/button.component"
 import XLSXViewer from "../components/XLSXViewer.component"
 import { useGetEventById } from "../hooks/query/event.query"
-import { getSampleCertificateAPI, generateCertificateAPI } from "../services/apis/certificate.api"
+import { getSampleCertificateAPI, generateCertificateAPI, getCertificatezipAPI } from "../services/apis/certificate.api"
 import { updateEventByIdAPI, deleteEventByIdAPI } from "../services/apis/event.api"
 import { updateEventSchema } from "../validators/event.validator"
 
@@ -40,7 +45,7 @@ export default function EventDetailPage() {
   const navigate = useNavigate()
   const { id } = useParams()
   const { data, isLoading, isError } = useGetEventById(Number(id))
-
+  const [isDownloadDialogOpen, setIsDownloadDialogOpen] = useState(false)
   const activity = data?.data?.data?.event ?? null
 
   const resolveFileUrl = (url?: string | null): string | null => {
@@ -294,6 +299,28 @@ export default function EventDetailPage() {
         </Container>
       </Box>
     )
+  }
+
+  const handleDownloadZip = async () => {
+    try {
+      const res = await getCertificatezipAPI(Number(id))
+
+      const blob = new Blob([res.data], { type: "application/zip" })
+      const url = URL.createObjectURL(blob)
+
+      const link = document.createElement("a")
+      link.href = url
+      link.download = `certificates-${id}.zip`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      URL.revokeObjectURL(url)
+      setIsDownloadDialogOpen(false)
+    } catch (error) {
+      console.error("Error downloading zip:", error)
+      alert("เกิดข้อผิดพลาดในการดาวน์โหลด")
+    }
   }
 
   return (
@@ -674,9 +701,44 @@ export default function EventDetailPage() {
                   text={isGenerating ? "กำลังสร้าง..." : generateSuccess ? "สร้างสำเร็จ!" : "สร้างใบประกาศนียบัตร"}
                   width={{ xs: "100%", md: "auto" }}
                 />
-                <Button variant="outlined" endIcon={<MdFileDownload size={16} />} sx={{ display: status === "cert_generated" ? "" : "none", borderColor: "#0C86FE", color: "#0C86FE", "&:hover": { borderColor: "#0C86FE", backgroundColor: "rgba(12, 134, 254, 0.1)" } }}>
+                <Button
+                  variant="outlined"
+                  endIcon={<MdFileDownload size={16} />}
+                  onClick={() =>
+                    setIsDownloadDialogOpen(true)
+                  }
+                  sx={{
+                    display: status === "cert_generated" ? "" : "none",
+                    borderColor: "#0C86FE",
+                    color: "#0C86FE",
+                    "&:hover": { borderColor: "#0C86FE", backgroundColor: "rgba(12, 134, 254, 0.1)" }
+                  }}
+                >
                   ดาวน์โหลดใบประกาศนียบัตร
                 </Button>
+                <Dialog open={isDownloadDialogOpen} onClose={() => setIsDownloadDialogOpen(false)} sx={{ "& .MuiPaper-root": { borderRadius: "12px", padding: 2 } }}>
+                  <DialogTitle sx={{ fontWeight: 600, color: "#1e293b" }}>
+                    ยืนยันการดาวน์โหลด
+                  </DialogTitle>
+                  <DialogContent>
+                    <DialogContentText sx={{ color: "#64748b" }}>
+                      ระบบจะดาวน์โหลดใบประกาศนียบัตรทั้งหมดในรูปแบบไฟล์ <strong>.zip</strong> คุณต้องการดาวน์โหลดใช่หรือไม่?
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
+                    <Button
+                      onClick={() => setIsDownloadDialogOpen(false)}
+                      sx={{ color: "#64748b", "&:hover": { backgroundColor: "#f1f5f9" } }}
+                    >
+                      ยกเลิก
+                    </Button>
+                    <ButtonComponent
+                      startIcon={<MdFileDownload size={16} />}
+                      onclick={handleDownloadZip}
+                      text="ดาวน์โหลด"
+                    />
+                  </DialogActions>
+                </Dialog>
               </Box>
             </Box>
           </Paper>
