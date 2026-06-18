@@ -55,7 +55,6 @@ export default function EventDetailPage() {
     const baseUrl = import.meta.env.VITE_IMG_URL || ""
     return `${baseUrl}${url}`
   }
-
   const [activityName, setActivityName] = useState<string>("")
   const [isEditingName, setIsEditingName] = useState(false)
   const [status, setStatus] = useState<string>("created")
@@ -692,10 +691,17 @@ export default function EventDetailPage() {
             <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 2, alignItems: "center", justifyContent: "space-between" }}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                 <MdTipsAndUpdates size={18} style={{ color: "#0C86FE" }} />
-                <Typography sx={{ fontSize: "16px", fontWeight: 600, color: "#1e293b" }}>สร้างและดาวน์โหลดใบประกาศนียบัตรทั้งหมด</Typography>
+                <Typography sx={{ fontSize: { xs: "15px", md: "16px" }, fontWeight: 600, color: "#1e293b" }}>สร้างและดาวน์โหลดใบประกาศนียบัตรทั้งหมด</Typography>
               </Box>
-              <Box sx={{ display: "flex", gap: {xs: 0, md: 2}, flexWrap: "wrap", justifyContent: { xs: "center", md: "flex-end" } }}>
-                <ButtonComponent
+              <Box sx={{
+                display: "flex",
+                gap: 2,
+                flexWrap: "wrap",
+                justifyContent: { xs: "center", md: "flex-end" },
+                width: { xs: "100%", md: "auto" } // ← fix
+              }}>
+                <Button
+                  variant="contained"
                   endIcon={
                     isGenerating
                       ? <CircularProgress size={16} sx={{ color: "#fff" }} />
@@ -703,26 +709,40 @@ export default function EventDetailPage() {
                         ? <MdCheck size={16} />
                         : <MdTipsAndUpdates size={16} />
                   }
-                  onclick={isGenerating ? undefined : handleGenerateCertificate}
-                  text={isGenerating ? "กำลังสร้าง..." : generateSuccess ? "สร้างสำเร็จ!" : "สร้างใบประกาศนียบัตร"}
-                  width={{ xs: "100%", md: "auto" }}
-                />
-                <Button
-                  variant="outlined"
-                  endIcon={<MdFileDownload size={16} />}
-                  onClick={() =>
-                    setIsDownloadDialogOpen(true)
-                  }
+                  onClick={isGenerating ? undefined : handleGenerateCertificate}
                   sx={{
+                    fontSize: "14px",
+                    fontWeight: 600,
+                    backgroundColor: "#0C86FE",
+                    color: "#fff",
+                    textTransform: "none",
+                    borderRadius: "none",
                     width: { xs: "100%", md: "auto" },
-                    display: status === "cert_generated" ? "" : "none",
-                    borderColor: "#0C86FE",
-                    color: "#0C86FE",
-                    "&:hover": { borderColor: "#0C86FE", backgroundColor: "rgba(12, 134, 254, 0.1)" }
+                    boxShadow: "0 3px 7px rgba(12,134,254,0.3)",
+                    "&:hover": {
+                      backgroundColor: "#097df2",
+                      boxShadow: "0 3px 7px rgba(12,134,254,0.3)",
+                    },
                   }}
                 >
-                  ดาวน์โหลดใบประกาศนียบัตร
+                  {isGenerating ? "กำลังสร้าง..." : generateSuccess ? "สร้างสำเร็จ!" : "สร้างใบประกาศนียบัตร"}
                 </Button>
+                {status === "cert_generated" && (
+                  <Button
+                    variant="outlined"
+                    endIcon={<MdFileDownload size={16} />}
+                    onClick={() => setIsDownloadDialogOpen(true)}
+                    sx={{
+                      width: { xs: "100%", md: "auto" },
+                      borderColor: "#0C86FE",
+                      color: "#0C86FE",
+                      textTransform: "none",
+                      "&:hover": { borderColor: "#0C86FE", backgroundColor: "rgba(12, 134, 254, 0.1)" }
+                    }}
+                  >
+                    ดาวน์โหลดใบประกาศนียบัตร
+                  </Button>
+                )}
                 <Dialog open={isDownloadDialogOpen} onClose={() => setIsDownloadDialogOpen(false)} sx={{ "& .MuiPaper-root": { borderRadius: "12px", padding: 2 } }}>
                   <DialogTitle sx={{ fontWeight: 600, color: "#1e293b" }}>
                     ยืนยันการดาวน์โหลด
