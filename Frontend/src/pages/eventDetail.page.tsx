@@ -614,7 +614,7 @@ export default function EventDetailPage() {
                 )}
                 <Stack spacing={2}>
                   <Box>
-                    <Typography sx={{ fontSize: "14px", color: "#64748b", display: "block", mb: 0.5 }}>ขนาดฟ้อนท์</Typography>
+                    <Typography sx={{ fontSize: "14px", color: "#64748b", display: "block", mb: 0.5 }}>ขนาดฟอนต์</Typography>
                     <TextField
                       type="number"
                       value={fieldConfig.fontSize}
@@ -683,7 +683,7 @@ export default function EventDetailPage() {
                     : <MdOutlineFileUpload size={16} />
               }
               onclick={isUpdating ? undefined : handleUpdateEvent}
-              text={isUpdating ? "กำลังอัพเดต..." : updateSuccess ? "อัพเดตสำเร็จ!" : "อัพเดตกิจกรรม"}
+              text={isUpdating ? "กำลังอัปเดต..." : updateSuccess ? "อัปเดตสำเร็จ!" : "อัปเดตกิจกรรม"}
               width="100%"
             />
           </Box>
