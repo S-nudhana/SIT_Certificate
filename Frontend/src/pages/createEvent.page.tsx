@@ -558,7 +558,7 @@ export default function CreateEventPage() {
                 <Stack spacing={2}>
                   <Box>
                     <Typography sx={{ fontSize: "14px", color: "#64748b", display: "block", mb: 0.5 }}>
-                      ขนาดฟอนต์
+                      ขนาดฟอนต์ (1-200px)
                     </Typography>
                     <TextField
                       type="number"
