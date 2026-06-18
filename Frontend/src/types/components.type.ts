@@ -28,3 +28,8 @@ export interface HideOnScrollProps {
     window?: () => Window;
     children?: React.ReactElement<unknown>;
 }
+
+export interface AlertProps {
+  status: "success" | "error" | "warning" | "info";
+  message: string;
+}

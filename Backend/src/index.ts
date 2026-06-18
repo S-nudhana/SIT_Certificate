@@ -47,11 +47,11 @@ app.use('*', rateLimiterConfig)
 app.use('*', logger())
 
 app.get('/api/health', (c: Context) => c.json({ status: 'ok', message: 'API is running' }))
-app.use('/uploads/*', serveStatic({
-  root: './uploads',
-  rewriteRequestPath: (path) => path.replace(/^\/uploads/, '')
-}))
 
+app.use('/api/uploads/*', serveStatic({
+  root: './',
+  rewriteRequestPath: (path) => path.replace(/^\/api/, '')
+}))
 app.route('/api', openapi)
 
 export default {

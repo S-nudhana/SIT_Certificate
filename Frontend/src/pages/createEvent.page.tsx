@@ -28,6 +28,7 @@ import BackBTN from "../components/backBTN.component";
 import PdfViewer from "../components/PDFViewer.component";
 import ButtonComponent from "../components/button.component";
 import XLSXViewer from "../components/XLSXViewer.component";
+import AlertComponent from "../components/alert.component";
 
 import { createEventSchema } from "../validators/event.validator";
 
@@ -37,7 +38,7 @@ export default function CreateEventPage() {
 
   const [activityName, setActivityName] = useState<string>("ชื่อกิจกรรม");
   const [isEditingName, setIsEditingName] = useState<boolean>(false);
-
+  const [alert, setAlert] = useState<{ status: "success" | "error" | "warning" | "info"; message: string } | null>(null);
   const [pdfFile, setPdfFile] = useState<File | undefined>();
   const [pdfUrl, setPdfUrl] = useState<string | null>();
   const [excelFile, setExcelFile] = useState<File | undefined>();
@@ -106,7 +107,8 @@ export default function CreateEventPage() {
       }
     } catch (error) {
       console.error("Error fetching sample certificate:", error);
-      alert("เกิดข้อผิดพลาดในการดึงตัวอย่างใบประกาศนียบัตร");
+      setAlert({ status: "error", message: "เกิดข้อผิดพลาดในการดึงตัวอย่างใบประกาศนียบัตร" });
+      setTimeout(() => setAlert(null), 5000);
     }
   };
 
@@ -142,14 +144,17 @@ export default function CreateEventPage() {
         textY: Number(fieldConfig.top),
       });
       if (res.status === 201) {
-        alert("สร้างกิจกรรมสำเร็จ!");
+        setAlert({ status: "success", message: "สร้างกิจกรรมสำเร็จ!" });
+        setTimeout(() => setAlert(null), 5000);
         navigate("/event/" + res.data.data.eventID);
         return;
       }
-      alert("เกิดข้อผิดพลาดในการสร้างกิจกรรม");
+      setAlert({ status: "success", message: "เกิดข้อผิดพลาดในการสร้างกิจกรรม" });
+      setTimeout(() => setAlert(null), 5000);
     } catch (error) {
       console.error("Error creating event:", error);
-      alert("เกิดข้อผิดพลาดในการสร้างกิจกรรม");
+      setAlert({ status: "success", message: "เกิดข้อผิดพลาดในการสร้างกิจกรรม" });
+      setTimeout(() => setAlert(null), 5000);
     }
   };
 
@@ -621,6 +626,11 @@ export default function CreateEventPage() {
           </Box>
         </Stack>
       </Container>
+      {alert && (
+        <Box sx={{ position: "fixed", top: 20, right: 20, zIndex: 9999, minWidth: 300 }}>
+          <AlertComponent status={alert.status} message={alert.message} />
+        </Box>
+      )}
     </Box>
   );
 }

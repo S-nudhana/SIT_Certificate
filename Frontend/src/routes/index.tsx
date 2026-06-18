@@ -4,6 +4,8 @@ import Homepage from "../pages/home.page";
 import Login from "../pages/login.page";
 import EventDetail from "../pages/eventDetail.page";
 import CreateEvent from "../pages/createEvent.page";
+import NotFound from "../pages/notFound.page";
+
 import ProtectedRoute from "../middleware/protectedRoute.middleware";
 import PublicRoute from "../middleware/publicRoute.middleware";
 
@@ -27,12 +29,9 @@ export const router = createBrowserRouter([
   {
     path: "/event/:id",
     element: (
-      // <ProtectedRoute>
-      //   <EventDetail />
-      // </ProtectedRoute>
-      <PublicRoute>
+      <ProtectedRoute>
         <EventDetail />
-      </PublicRoute>
+      </ProtectedRoute>
     ),
   },
   {
@@ -42,5 +41,9 @@ export const router = createBrowserRouter([
         <CreateEvent />
       </ProtectedRoute>
     ),
+  },
+  {
+    path: "*",
+    element: <NotFound />,
   },
 ]);
