@@ -1,3 +1,60 @@
+// import { useState, useRef, useEffect, useCallback } from "react"
+// import {
+//   Box,
+//   Button,
+//   Stack,
+//   TextField,
+//   Typography,
+//   Paper,
+//   Container,
+//   CircularProgress,
+//   Dialog,
+//   DialogTitle,
+//   DialogContent,
+//   DialogContentText,
+//   DialogActions
+// } from "@mui/material"
+// import {
+//   MdEdit,
+//   MdDescription,
+//   MdGroup,
+//   MdTipsAndUpdates,
+//   MdSettings,
+//   MdDelete,
+//   MdUploadFile,
+//   MdOutlineFileUpload,
+//   MdCheck,
+//   MdFileDownload
+// } from "react-icons/md"
+// import { useNavigate, useParams } from "react-router-dom"
+
+// import Navbar from "../components/navbar.component"
+// import StatusBadge from "../components/statusBadge.component"
+// import BackBTN from "../components/backBTN.component"
+// import PdfViewer from "../components/PDFViewer.component"
+// import ButtonComponent from "../components/button.component"
+// import XLSXViewer from "../components/XLSXViewer.component"
+// import AlertComponent from "../components/alert.component"
+
+// import { useGetEventById } from "../hooks/query/event.query"
+// import { getSampleCertificateAPI, generateCertificateAPI, getCertificatezipAPI } from "../services/apis/certificate.api"
+// import { updateEventByIdAPI, deleteEventByIdAPI } from "../services/apis/event.api"
+// import { updateEventSchema } from "../validators/event.validator"
+
+// import type { FieldConfig } from "../types/event/eventDetail.type"
+
+// export default function EventDetailPage() {
+//   const navigate = useNavigate()
+//   const { id } = useParams()
+//   const { data, isLoading, isError } = useGetEventById(Number(id))
+//   const [isDownloadDialogOpen, setIsDownloadDialogOpen] = useState(false)
+//   const activity = data?.data?.data?.event ?? null
+//   const [alert, setAlert] = useState<{ status: "success" | "error" | "warning" | "info"; message: string } | null>(null);
+//   const resolveFileUrl = (url?: string | null): string | null => {
+//     if (!url) return null
+//     const baseUrl = import.meta.env.VITE_IMG_URL || ""
+//     return `${baseUrl}${url}`
+//   }
 import { useState, useRef, useEffect, useCallback } from "react"
 import {
   Box,
@@ -43,10 +100,39 @@ import { updateEventSchema } from "../validators/event.validator"
 
 import type { FieldConfig } from "../types/event/eventDetail.type"
 
+// ↓ Toggle this to use mock data
+const USE_MOCK = true
+
+const mockEvent = {
+  data: {
+    data: {
+      event: {
+        eventID: 1,
+        eventTitle: "SIT_CAMP",
+        eventStatus: "cert_generated",
+        status: "cert_generated",
+        eventTextSize: "24",
+        eventTextXPos: "50",
+        eventTextYPos: "50",
+        certificateURL: null,
+        excelURL: null,
+        eventCreateAt: "2025-01-01T00:00:00.000Z",
+        eventUpdateAt: "2025-06-01T00:00:00.000Z",
+      }
+    }
+  }
+}
+
 export default function EventDetailPage() {
   const navigate = useNavigate()
   const { id } = useParams()
-  const { data, isLoading, isError } = useGetEventById(Number(id))
+
+  const { data: realData, isLoading: realLoading, isError: realError } = useGetEventById(USE_MOCK ? -1 : Number(id))
+
+  const data = USE_MOCK ? mockEvent : realData
+  const isLoading = USE_MOCK ? false : realLoading
+  const isError = USE_MOCK ? false : realError
+
   const [isDownloadDialogOpen, setIsDownloadDialogOpen] = useState(false)
   const activity = data?.data?.data?.event ?? null
   const [alert, setAlert] = useState<{ status: "success" | "error" | "warning" | "info"; message: string } | null>(null);
@@ -692,10 +778,17 @@ export default function EventDetailPage() {
             <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 2, alignItems: "center", justifyContent: "space-between" }}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                 <MdTipsAndUpdates size={18} style={{ color: "#0C86FE" }} />
-                <Typography sx={{ fontSize: "16px", fontWeight: 600, color: "#1e293b" }}>สร้างและดาวน์โหลดใบประกาศนียบัตรทั้งหมด</Typography>
+                <Typography sx={{ fontSize: { xs: "15px", md: "16px" }, fontWeight: 600, color: "#1e293b" }}>สร้างและดาวน์โหลดใบประกาศนียบัตรทั้งหมด</Typography>
               </Box>
-              <Box sx={{ display: "flex", gap: {xs: 0, md: 2}, flexWrap: "wrap", justifyContent: { xs: "center", md: "flex-end" } }}>
-                <ButtonComponent
+              <Box sx={{
+                display: "flex",
+                gap: 2,
+                flexWrap: "wrap",
+                justifyContent: { xs: "center", md: "flex-end" },
+                width: { xs: "100%", md: "auto" } // ← fix
+              }}>
+                <Button
+                  variant="contained"
                   endIcon={
                     isGenerating
                       ? <CircularProgress size={16} sx={{ color: "#fff" }} />
@@ -703,26 +796,40 @@ export default function EventDetailPage() {
                         ? <MdCheck size={16} />
                         : <MdTipsAndUpdates size={16} />
                   }
-                  onclick={isGenerating ? undefined : handleGenerateCertificate}
-                  text={isGenerating ? "กำลังสร้าง..." : generateSuccess ? "สร้างสำเร็จ!" : "สร้างใบประกาศนียบัตร"}
-                  width={{ xs: "100%", md: "auto" }}
-                />
-                <Button
-                  variant="outlined"
-                  endIcon={<MdFileDownload size={16} />}
-                  onClick={() =>
-                    setIsDownloadDialogOpen(true)
-                  }
+                  onClick={isGenerating ? undefined : handleGenerateCertificate}
                   sx={{
+                    fontSize: "14px",
+                    fontWeight: 600,
+                    backgroundColor: "#0C86FE",
+                    color: "#fff",
+                    textTransform: "none",
+                    borderRadius: "none",
                     width: { xs: "100%", md: "auto" },
-                    display: status === "cert_generated" ? "" : "none",
-                    borderColor: "#0C86FE",
-                    color: "#0C86FE",
-                    "&:hover": { borderColor: "#0C86FE", backgroundColor: "rgba(12, 134, 254, 0.1)" }
+                    boxShadow: "0 3px 7px rgba(12,134,254,0.3)",
+                    "&:hover": {
+                      backgroundColor: "#097df2",
+                      boxShadow: "0 3px 7px rgba(12,134,254,0.3)",
+                    },
                   }}
                 >
-                  ดาวน์โหลดใบประกาศนียบัตร
+                  {isGenerating ? "กำลังสร้าง..." : generateSuccess ? "สร้างสำเร็จ!" : "สร้างใบประกาศนียบัตร"}
                 </Button>
+                {status === "cert_generated" && (
+                  <Button
+                    variant="outlined"
+                    endIcon={<MdFileDownload size={16} />}
+                    onClick={() => setIsDownloadDialogOpen(true)}
+                    sx={{
+                      width: { xs: "100%", md: "auto" },
+                      borderColor: "#0C86FE",
+                      color: "#0C86FE",
+                      textTransform: "none",
+                      "&:hover": { borderColor: "#0C86FE", backgroundColor: "rgba(12, 134, 254, 0.1)" }
+                    }}
+                  >
+                    ดาวน์โหลดใบประกาศนียบัตร
+                  </Button>
+                )}
                 <Dialog open={isDownloadDialogOpen} onClose={() => setIsDownloadDialogOpen(false)} sx={{ "& .MuiPaper-root": { borderRadius: "12px", padding: 2 } }}>
                   <DialogTitle sx={{ fontWeight: 600, color: "#1e293b" }}>
                     ยืนยันการดาวน์โหลด
