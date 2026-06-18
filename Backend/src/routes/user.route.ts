@@ -8,8 +8,11 @@ import authorize from '../controllers/user/authorize.controller'
 const user = new Hono()
 
 user.use("/auth/google", oauthGoogleConfig)
-
 user.get('/auth/google', login)
+
+user.use("/auth/google/callback", oauthGoogleConfig)
+user.get('/auth/google/callback', login)
+
 user.get('/authorize', authorize)
 user.get('/logout', logout)
 

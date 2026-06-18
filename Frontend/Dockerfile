@@ -1,15 +1,20 @@
-FROM node:22-alpine AS build
+FROM oven/bun:1 AS builder
 
 WORKDIR /app
 
+COPY package.json bun.lock* ./
+RUN bun install
+
 COPY . .
+RUN bun run build
 
-RUN npm install
+# Stage 2: Serve
+FROM oven/bun:1-slim AS runner
 
-RUN npm run build
+WORKDIR /app
 
-FROM nginx:alpine
+COPY --from=builder /app/dist ./dist
 
-COPY --from=build /app/dist /usr/share/nginx/html
+EXPOSE 3000
 
-EXPOSE 80
+CMD ["bunx", "serve", "-s", "dist", "-l", "3000"]

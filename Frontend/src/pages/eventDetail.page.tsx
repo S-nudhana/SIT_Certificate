@@ -34,6 +34,8 @@ import BackBTN from "../components/backBTN.component"
 import PdfViewer from "../components/PDFViewer.component"
 import ButtonComponent from "../components/button.component"
 import XLSXViewer from "../components/XLSXViewer.component"
+import AlertComponent from "../components/alert.component"
+
 import { useGetEventById } from "../hooks/query/event.query"
 import { getSampleCertificateAPI, generateCertificateAPI, getCertificatezipAPI } from "../services/apis/certificate.api"
 import { updateEventByIdAPI, deleteEventByIdAPI } from "../services/apis/event.api"
@@ -47,7 +49,7 @@ export default function EventDetailPage() {
   const { data, isLoading, isError } = useGetEventById(Number(id))
   const [isDownloadDialogOpen, setIsDownloadDialogOpen] = useState(false)
   const activity = data?.data?.data?.event ?? null
-
+  const [alert, setAlert] = useState<{ status: "success" | "error" | "warning" | "info"; message: string } | null>(null);
   const resolveFileUrl = (url?: string | null): string | null => {
     if (!url) return null
     const baseUrl = import.meta.env.VITE_IMG_URL || ""
@@ -130,7 +132,8 @@ export default function EventDetailPage() {
       navigate("/")
     } catch (error) {
       console.error("Error deleting event:", error)
-      alert("เกิดข้อผิดพลาดในการลบกิจกรรม")
+      setAlert({ status: "error", message: "เกิดข้อผิดพลาดในการลบกิจกรรม" });
+      setTimeout(() => setAlert(null), 5000);
     } finally {
       setIsDeleting(false)
     }
@@ -254,7 +257,8 @@ export default function EventDetailPage() {
       }
     } catch (error) {
       console.error("Error updating event:", error)
-      alert("เกิดข้อผิดพลาดในการอัปเดตกิจกรรม")
+      setAlert({ status: "error", message: "เกิดข้อผิดพลาดในการอัปเดตกิจกรรม" });
+      setTimeout(() => setAlert(null), 5000);
     } finally {
       setIsUpdating(false)
     }
@@ -269,7 +273,8 @@ export default function EventDetailPage() {
       setTimeout(() => setGenerateSuccess(false), 3000)
     } catch (error) {
       console.error("Error generating certificate:", error)
-      alert("เกิดข้อผิดพลาดในการสร้างใบรับรอง")
+      setAlert({ status: "error", message: "เกิดข้อผิดพลาดในการสร้างใบรับรอง" });
+      setTimeout(() => setAlert(null), 5000);
     } finally {
       setIsGenerating(false)
     }
@@ -319,7 +324,8 @@ export default function EventDetailPage() {
       setIsDownloadDialogOpen(false)
     } catch (error) {
       console.error("Error downloading zip:", error)
-      alert("เกิดข้อผิดพลาดในการดาวน์โหลด")
+      setAlert({ status: "error", message: "เกิดข้อผิดพลาดในการดาวน์โหลด" });
+      setTimeout(() => setAlert(null), 5000);
     }
   }
 
@@ -708,6 +714,7 @@ export default function EventDetailPage() {
                     setIsDownloadDialogOpen(true)
                   }
                   sx={{
+                    width: { xs: "100%", md: "auto" },
                     display: status === "cert_generated" ? "" : "none",
                     borderColor: "#0C86FE",
                     color: "#0C86FE",
@@ -755,6 +762,11 @@ export default function EventDetailPage() {
           </Paper>
         </Stack>
       </Container>
+      {alert && (
+        <Box sx={{ position: "fixed", top: 20, right: 20, zIndex: 9999, minWidth: 300 }}>
+          <AlertComponent status={alert.status} message={alert.message} />
+        </Box>
+      )}
     </Box>
   )
 }

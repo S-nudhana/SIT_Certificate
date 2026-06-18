@@ -32,7 +32,7 @@ export default function ProtectedRoute({ children }: Props) {
             }
         };
         checkAuth();
-    }, [dispatch]);
+    }, []);
 
     if (loading) return (
         <Box>
