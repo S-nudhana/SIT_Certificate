@@ -1,60 +1,3 @@
-// import { useState, useRef, useEffect, useCallback } from "react"
-// import {
-//   Box,
-//   Button,
-//   Stack,
-//   TextField,
-//   Typography,
-//   Paper,
-//   Container,
-//   CircularProgress,
-//   Dialog,
-//   DialogTitle,
-//   DialogContent,
-//   DialogContentText,
-//   DialogActions
-// } from "@mui/material"
-// import {
-//   MdEdit,
-//   MdDescription,
-//   MdGroup,
-//   MdTipsAndUpdates,
-//   MdSettings,
-//   MdDelete,
-//   MdUploadFile,
-//   MdOutlineFileUpload,
-//   MdCheck,
-//   MdFileDownload
-// } from "react-icons/md"
-// import { useNavigate, useParams } from "react-router-dom"
-
-// import Navbar from "../components/navbar.component"
-// import StatusBadge from "../components/statusBadge.component"
-// import BackBTN from "../components/backBTN.component"
-// import PdfViewer from "../components/PDFViewer.component"
-// import ButtonComponent from "../components/button.component"
-// import XLSXViewer from "../components/XLSXViewer.component"
-// import AlertComponent from "../components/alert.component"
-
-// import { useGetEventById } from "../hooks/query/event.query"
-// import { getSampleCertificateAPI, generateCertificateAPI, getCertificatezipAPI } from "../services/apis/certificate.api"
-// import { updateEventByIdAPI, deleteEventByIdAPI } from "../services/apis/event.api"
-// import { updateEventSchema } from "../validators/event.validator"
-
-// import type { FieldConfig } from "../types/event/eventDetail.type"
-
-// export default function EventDetailPage() {
-//   const navigate = useNavigate()
-//   const { id } = useParams()
-//   const { data, isLoading, isError } = useGetEventById(Number(id))
-//   const [isDownloadDialogOpen, setIsDownloadDialogOpen] = useState(false)
-//   const activity = data?.data?.data?.event ?? null
-//   const [alert, setAlert] = useState<{ status: "success" | "error" | "warning" | "info"; message: string } | null>(null);
-//   const resolveFileUrl = (url?: string | null): string | null => {
-//     if (!url) return null
-//     const baseUrl = import.meta.env.VITE_IMG_URL || ""
-//     return `${baseUrl}${url}`
-//   }
 import { useState, useRef, useEffect, useCallback } from "react"
 import {
   Box,
@@ -100,39 +43,10 @@ import { updateEventSchema } from "../validators/event.validator"
 
 import type { FieldConfig } from "../types/event/eventDetail.type"
 
-// ↓ Toggle this to use mock data
-const USE_MOCK = true
-
-const mockEvent = {
-  data: {
-    data: {
-      event: {
-        eventID: 1,
-        eventTitle: "SIT_CAMP",
-        eventStatus: "cert_generated",
-        status: "cert_generated",
-        eventTextSize: "24",
-        eventTextXPos: "50",
-        eventTextYPos: "50",
-        certificateURL: null,
-        excelURL: null,
-        eventCreateAt: "2025-01-01T00:00:00.000Z",
-        eventUpdateAt: "2025-06-01T00:00:00.000Z",
-      }
-    }
-  }
-}
-
 export default function EventDetailPage() {
   const navigate = useNavigate()
   const { id } = useParams()
-
-  const { data: realData, isLoading: realLoading, isError: realError } = useGetEventById(USE_MOCK ? -1 : Number(id))
-
-  const data = USE_MOCK ? mockEvent : realData
-  const isLoading = USE_MOCK ? false : realLoading
-  const isError = USE_MOCK ? false : realError
-
+  const { data, isLoading, isError } = useGetEventById(Number(id))
   const [isDownloadDialogOpen, setIsDownloadDialogOpen] = useState(false)
   const activity = data?.data?.data?.event ?? null
   const [alert, setAlert] = useState<{ status: "success" | "error" | "warning" | "info"; message: string } | null>(null);
@@ -141,7 +55,6 @@ export default function EventDetailPage() {
     const baseUrl = import.meta.env.VITE_IMG_URL || ""
     return `${baseUrl}${url}`
   }
-
   const [activityName, setActivityName] = useState<string>("")
   const [isEditingName, setIsEditingName] = useState(false)
   const [status, setStatus] = useState<string>("created")
