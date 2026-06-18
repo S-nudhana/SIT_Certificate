@@ -34,3 +34,6 @@ networks:
     driver: bridge
   db-network:
     external: true
+
+volumes:
+  backend-data:
