@@ -694,33 +694,19 @@ export default function EventDetailPage() {
                 <MdTipsAndUpdates size={18} style={{ color: "#0C86FE" }} />
                 <Typography sx={{ fontSize: "16px", fontWeight: 600, color: "#1e293b" }}>สร้างและดาวน์โหลดใบประกาศนียบัตรทั้งหมด</Typography>
               </Box>
-              <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", justifyContent: { xs: "center", md: "flex-end" } }}>
-                <Button 
-                  variant="contained"
-                  endIcon={isGenerating
-                    ? <CircularProgress size={16} sx={{ color: "#fff" }} />
-                    : generateSuccess
-                      ? <MdCheck size={16} />
-                      : <MdTipsAndUpdates size={16} />}
-                  onClick={isGenerating ? undefined : handleGenerateCertificate}
-                  sx={{
-                    fontSize: "14px",
-                    fontWeight: 600,
-                    backgroundColor: "#0C86FE",
-                    color: "#fff",
-                    textTransform: "none",
-                    borderRadius: "none",
-                    px: 3,
-                    width: { xs: "100%", md: "auto" },
-                    transform: ".2s",
-                    boxShadow: "0 3px 7px rgba(12,134,254,0.3)",
-                    "&:hover": {
-                      backgroundColor: "#097df2",
-                      boxShadow: "0 3px 7px rgba(12,134,254,0.3)",
-                    },
-                  }}>
-                  {isGenerating ? "กำลังสร้าง..." : generateSuccess ? "สร้างสำเร็จ!" : "สร้างใบประกาศนียบัตร"}
-                </Button>
+              <Box sx={{ display: "flex", gap: {xs: 0, md: 2}, flexWrap: "wrap", justifyContent: { xs: "center", md: "flex-end" } }}>
+                <ButtonComponent
+                  endIcon={
+                    isGenerating
+                      ? <CircularProgress size={16} sx={{ color: "#fff" }} />
+                      : generateSuccess
+                        ? <MdCheck size={16} />
+                        : <MdTipsAndUpdates size={16} />
+                  }
+                  onclick={isGenerating ? undefined : handleGenerateCertificate}
+                  text={isGenerating ? "กำลังสร้าง..." : generateSuccess ? "สร้างสำเร็จ!" : "สร้างใบประกาศนียบัตร"}
+                  width={{ xs: "100%", md: "auto" }}
+                />
                 <Button
                   variant="outlined"
                   endIcon={<MdFileDownload size={16} />}
