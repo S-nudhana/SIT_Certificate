@@ -702,7 +702,7 @@ export default function EventDetailPage() {
               }}>
                 <Button
                   variant="contained"
-                  endIcon={
+                  startIcon={
                     isGenerating
                       ? <CircularProgress size={16} sx={{ color: "#fff" }} />
                       : generateSuccess
@@ -730,7 +730,7 @@ export default function EventDetailPage() {
                 {status === "cert_generated" && (
                   <Button
                     variant="outlined"
-                    endIcon={<MdFileDownload size={16} />}
+                    startIcon={<MdFileDownload size={16} />}
                     onClick={() => setIsDownloadDialogOpen(true)}
                     sx={{
                       width: { xs: "100%", md: "auto" },
