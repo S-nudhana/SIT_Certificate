@@ -188,12 +188,13 @@ export default function CreateEventPage() {
                       <TextField
                         value={activityName}
                         placeholder="ชื่อกิจกรรม..."
+                        label={<span>ชื่อกิจกรรม <span style={{ color: "#ef4444" }}>*</span></span>}
                         onChange={(e) => {
                           setActivityName(e.target.value);
                           clearError("activityName");
                         }}
                         onBlur={() => {
-                          if (activityName.trim()) setIsEditingName(false);  // ← don't close if empty
+                          if (activityName.trim()) setIsEditingName(false);
                         }}
                         onKeyDown={(e) => e.key === "Enter" && setIsEditingName(false)}
                         autoFocus
@@ -223,6 +224,7 @@ export default function CreateEventPage() {
                           onClick={() => setIsEditingName(true)}
                         >
                           {activityName || "คลิกเพื่อตั้งชื่อกิจกรรม..."}
+                          <span style={{ color: "#ef4444", fontStyle: "normal", marginLeft: "4px" }}>*</span>
                         </Typography>
                         {errors.activityName && (
                           <Typography sx={{ color: "#ef4444", fontSize: "12px" }}>
