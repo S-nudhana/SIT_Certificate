@@ -36,8 +36,8 @@ export default function CreateEventPage() {
   const navigate = useNavigate();
   const now = new Date();
 
-  const [activityName, setActivityName] = useState<string>("ชื่อกิจกรรม");
-  const [isEditingName, setIsEditingName] = useState<boolean>(false);
+  const [activityName, setActivityName] = useState<string>("")
+  const [isEditingName, setIsEditingName] = useState<boolean>(true)
   const [alert, setAlert] = useState<{ status: "success" | "error" | "warning" | "info"; message: string } | null>(null);
   const [pdfFile, setPdfFile] = useState<File | undefined>();
   const [pdfUrl, setPdfUrl] = useState<string | null>();
@@ -210,12 +210,13 @@ export default function CreateEventPage() {
                           sx={{
                             fontSize: "24px",
                             fontWeight: 700,
-                            color: errors.activityName ? "#ef4444" : "#1e293b",
+                            color: errors.activityName ? "#ef4444" : activityName ? "#1e293b" : "#94a3b8",
                             cursor: "pointer",
+                            fontStyle: activityName ? "normal" : "italic",
                           }}
                           onClick={() => setIsEditingName(true)}
                         >
-                          {activityName}
+                          {activityName || "คลิกเพื่อตั้งชื่อกิจกรรม..."}
                         </Typography>
                         {errors.activityName && (
                           <Typography sx={{ color: "#ef4444", fontSize: "12px" }}>
