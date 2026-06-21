@@ -129,6 +129,9 @@ export default function CreateEventPage() {
         fieldErrors[field] = err.message;
       });
       setErrors(fieldErrors);
+      if (fieldErrors.activityName) {
+        setIsEditingName(true);
+      }
       return;
     }
 
@@ -184,11 +187,14 @@ export default function CreateEventPage() {
                     {isEditingName ? (
                       <TextField
                         value={activityName}
+                        placeholder="ชื่อกิจกรรม..."
                         onChange={(e) => {
                           setActivityName(e.target.value);
                           clearError("activityName");
                         }}
-                        onBlur={() => setIsEditingName(false)}
+                        onBlur={() => {
+                          if (activityName.trim()) setIsEditingName(false);  // ← don't close if empty
+                        }}
                         onKeyDown={(e) => e.key === "Enter" && setIsEditingName(false)}
                         autoFocus
                         error={!!errors.activityName}
