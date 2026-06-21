@@ -33,3 +33,14 @@ export interface AlertProps {
   status: "success" | "error" | "warning" | "info";
   message: string;
 }
+
+export interface NormalizedRow {
+    firstname: string
+    lastname: string
+    email: string
+}
+
+export interface XLSXViewerProps {
+    file: File | null
+    onDataLoaded?: (data: Record<string, any>[]) => void
+}
