@@ -7,6 +7,7 @@ import { getCertificateGenerateSchema } from "../../validators/certificate.valid
 import { getEventCertificateTemplateExcelModel, updateEventStatusModel } from "../../models/event.model"
 import { insertCertificateRecord, getEventCertificateDownloadModel, deleteEventCertificateModel } from "../../models/certificate.model"
 import { fetchAndFillCertificate } from "../../utils/certificate"
+import { normalizeRow } from "../../utils/rowsMapping"
 
 export default async function getEventCertificateGenerate(c: Context) {
     let tempDir = ""
@@ -49,7 +50,11 @@ export default async function getEventCertificateGenerate(c: Context) {
 
         const generatedCertificates: { email: string, filename: string }[] = []
         for (const row of rows) {
-            const { firstname, lastname, email } = row as any
+            const { firstname, lastname, email } = normalizeRow(row as Record<string, any>)
+            if (!firstname || !lastname || !email) {
+                console.warn('Skipping row — missing required fields:', row)
+                continue
+            }
             const certificate: Buffer | null = await fetchAndFillCertificate(
                 pdfBytes,
                 firstname,
@@ -87,7 +92,7 @@ export default async function getEventCertificateGenerate(c: Context) {
             return c.json({ message: "Failed to update event status" }, 500)
         }
 
-        return c.json({status: "cert_generated", message: "Certificates generated successfully" })
+        return c.json({ status: "cert_generated", message: "Certificates generated successfully" })
     } catch (error) {
         console.error(error)
         return c.json({ message: "Internal Server Error" }, 500)
